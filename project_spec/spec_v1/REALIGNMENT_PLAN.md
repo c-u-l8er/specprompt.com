@@ -232,10 +232,10 @@ Acceptance:
 Target: `spec_v1/40_SECURITY_SECRETS_COMPLIANCE.md`, `spec_v1/10_API_CONTRACTS.md`, `spec_v1/60_TESTING_ACCEPTANCE.md`
 
 ### 6.1 Choose one fulfillment mode (and document it)
-- Mode A: Signed URLs (recommended default)
-- Mode B: Token + proxy download
+- Mode B: Token + proxy download (**selected v1 default**; entitlement is re-checked at download time)
+- Mode A: Signed URLs (optional; MUST NOT be implemented as the primary v1 mode unless explicitly accepted by a later ADR)
 
-Whichever is implemented MUST be the one described in the API contracts and tests.
+v1 MUST implement **Mode B**, and the API contracts and tests MUST reflect Mode B behavior.
 
 ### 6.2 Token rules (if token mode exists)
 - Tokens MUST be:

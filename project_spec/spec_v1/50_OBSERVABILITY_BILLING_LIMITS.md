@@ -131,9 +131,9 @@ SpecPrompt MUST emit metrics sufficient to operate v1 safely, including:
 - `entitlement_events_total{type,reason}`
 
 **Fulfillment**
-- `fulfillment_authorize_total{mode,status}` (signed_url/token; allowed/denied)
+- `fulfillment_authorize_total{mode,status}` (v1 default: token/proxy_stream; allowed/denied)
 - `fulfillment_denied_total{reason}` (inactive entitlement, not eligible, not found)
-- `download_token_redeem_total{status}` (if proxy mode exists)
+- `download_token_redeem_total{status}` (v1 default: proxy download)
 - `download_token_redeem_failed_total{reason}` (expired/revoked/not_found)
 - `artifact_downloads_total{artifactId}` (optional; beware cardinality)
 

@@ -305,16 +305,17 @@ Revocation MUST:
 
 ## 8) Fulfillment security (downloads, tokens, signed URLs)
 
-### 8.1 Preferred fulfillment mode (recommendation)
-v1-recommended default:
-- Mint short-lived **signed URLs** for object storage (Pattern A), OR
-- Mint short-lived **download tokens** and use a download proxy endpoint (Pattern B)
+### 8.1 Preferred fulfillment mode (v1 default)
+SpecPrompt v1 default fulfillment mode is:
+- Mint short-lived **download tokens** and use a **download proxy** endpoint (Pattern B).
 
-Both patterns MUST be time-bounded and auditable.
+Signed URLs (Pattern A) are optional in v1 and MUST NOT be used as the default fulfillment mode unless explicitly accepted in a later ADR.
+
+All fulfillment modes MUST be time-bounded and auditable.
 
 ### 8.2 Token/URL lifetimes (MUST)
-- Signed URLs MUST expire quickly (minutes recommended).
-- Download tokens MUST expire quickly (minutes-hours recommended).
+- Download tokens MUST expire quickly (minutes recommended; v1 default should be very short).
+- If signed URLs are used (optional v1), they MUST expire quickly (minutes recommended).
 - Long-lived links MUST NOT be used in v1.
 
 ### 8.3 Avoid token leakage via URL query params (SHOULD)

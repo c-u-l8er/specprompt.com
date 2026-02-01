@@ -2,13 +2,13 @@
 Version: 1.0  
 Status: Draft (normative once adopted)  
 Audience: Engineering  
-Last updated: 2026-01-31
+Last updated: 2026-02-01
 
 This document defines the **SpecPrompt v1** HTTP API contracts for:
 - checkout session creation
 - payment provider webhooks → order state transitions
 - entitlement issuance and querying
-- fulfillment authorization (download tokens / signed URLs)
+- fulfillment authorization (download tokens; v1 uses token + proxy download)
 - normalized errors, pagination, and idempotency
 
 Normative language:
@@ -70,7 +70,7 @@ All IDs are opaque strings; clients must not infer meaning:
 ### 2.2 Enums
 
 #### 2.2.1 PaymentProvider
-- `stripe` (example)
+- `stripe` (v1)
 - (add more later; do not break v1 behavior)
 
 #### 2.2.2 OrderStatus (minimum v1)
@@ -448,15 +448,19 @@ Errors:
 - `VALIDATION_FAILED` (unsupported event type / malformed payload)
 - `INTERNAL`
 
-### 9.2 Event mapping (provider-agnostic semantics)
-SpecPrompt MUST map provider events to internal transitions:
-- Payment succeeded → order transitions to `paid` or `active` and triggers entitlement issuance
-- Payment failed → `failed`
-- Refund → `refunded` and triggers entitlement revocation (per policy)
-- Subscription canceled/unpaid → `canceled` and/or entitlement becomes `inactive`
+### 9.2 Event mapping (Stripe v1 semantics)
+SpecPrompt v1 uses **Stripe** and MUST map verified Stripe events to internal transitions as defined in:
+- `spec_v1/adr/ADR-0003-stripe-payment-provider-and-order-transitions.md`
+
+Minimum v1 mapping semantics:
+- `checkout.session.completed` (and `checkout.session.async_payment_succeeded`) → order transitions to `paid` (one-time) or `active` (subscription) and triggers entitlement issuance
+- `checkout.session.async_payment_failed` → `failed`
+- `charge.refunded` → `refunded` and triggers entitlement revocation (per policy)
+- `charge.dispute.created` → `disputed` and triggers entitlement revocation (immediate)
+- Subscription end/unpaid signals (see ADR) → `canceled` and/or entitlement becomes `inactive`
 
 Out-of-order events:
-- The system MUST converge deterministically.
+- The system MUST converge deterministically (see ADR precedence rules).
 - Event processing MUST be safe to replay.
 
 ---
@@ -564,7 +568,7 @@ Notes:
 
 ## 12) Fulfillment
 
-### 12.1 Mint download authorization (token or signed URL)
+### 12.1 Mint download authorization (token; v1 default)
 `POST /v1/fulfillment/token`
 
 Auth: required  
@@ -578,17 +582,7 @@ Request:
 }
 ```
 
-Response (Pattern A: signed URL):
-```ProjectWHS/specprompt.com/project_spec/spec_v1/10_API_CONTRACTS.md#L1-999
-{
-  "artifactId": "string",
-  "mode": "signed_url",
-  "downloadUrl": "https://…",
-  "expiresAtMs": 0
-}
-```
-
-Response (Pattern B: token):
+Response (v1: token):
 ```ProjectWHS/specprompt.com/project_spec/spec_v1/10_API_CONTRACTS.md#L1-999
 {
   "artifactId": "string",
@@ -604,9 +598,11 @@ Rules:
   - artifact belongs to product
   - caller has active entitlement for product
   - entitlement eligibility covers artifact version / release time
-- Tokens/URLs MUST be time-bounded.
-- If tokens are single-use:
+- Tokens MUST be time-bounded.
+- Tokens SHOULD be single-use in v1:
   - redemption MUST transition token status to `redeemed` and deny reuse.
+- Fulfillment MUST use **token + proxy download** semantics:
+  - entitlement MUST be re-checked at download time (see `spec_v1/adr/ADR-0004-fulfillment-token-proxy-download.md`).
 
 Errors:
 - `ENTITLEMENT_INACTIVE`
@@ -614,24 +610,25 @@ Errors:
 - `NOT_FOUND` (artifact not visible / wrong product / wrong tenant)
 - `RATE_LIMITED`
 
-### 12.2 Download by token (optional proxy)
-If using “token + proxy download”:
+### 12.2 Download by token (v1 proxy download)
 `GET /v1/fulfillment/download?token=<opaque>`
 
 Auth:
-- MAY be optional if token is the bearer credential.
-- Recommended v1 defense-in-depth: require both auth + token.
+- REQUIRED (defense-in-depth): require both auth + token.
 
 Behavior:
 - Validates token:
   - exists, not expired, not revoked, not redeemed (if single-use)
-  - belongs to requesting user (if auth required)
+  - belongs to requesting user
+- Re-checks entitlement at download time (MUST):
+  - user still has an active, eligible entitlement for the artifact/product
+  - refunded/disputed/canceled states deny download deterministically
 - Streams artifact bytes with correct `Content-Type`.
 
 Errors:
 - `DOWNLOAD_TOKEN_INVALID`
 - `DOWNLOAD_TOKEN_EXPIRED`
-- `UNAUTHENTICATED` (if auth required)
+- `UNAUTHENTICATED`
 - `NOT_FOUND` (to reduce token enumeration; recommended)
 - `RATE_LIMITED`
 
@@ -660,7 +657,8 @@ Admin artifact registration MUST:
 - [ ] `POST /v1/webhooks/payment` verifies signatures and is idempotent (§9)
 - [ ] `GET /v1/orders` and `GET /v1/orders/:orderId` are tenant-safe (§10)
 - [ ] `GET /v1/entitlements` is tenant-safe and stable (§11)
-- [ ] `POST /v1/fulfillment/token` enforces eligibility and returns token/URL (§12)
+- [ ] `POST /v1/fulfillment/token` enforces eligibility and returns token (§12.1)
+- [ ] `GET /v1/fulfillment/download` streams by token and re-checks entitlement (§12.2)
 - [ ] Rate limiting is in place for checkout + fulfillment + webhooks (§3.2)
 - [ ] No secret leakage in logs/errors (provider secrets, raw webhook bodies) (§9.1)
 

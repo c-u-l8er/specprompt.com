@@ -2,7 +2,7 @@
 Version: 1.0  
 Status: Draft (normative once adopted)  
 Audience: Engineering  
-Last updated: 2026-01-31
+Last updated: 2026-02-01
 
 SpecPrompt is the portfolio’s **commerce/monetization layer** (Layer 6). It provides **checkout, licensing, entitlements, fulfillment**, and an **auditable commerce ledger** for commercial assets across the ecosystem.
 
@@ -29,7 +29,7 @@ A secure, idempotent commerce service that:
 4. Provides **Fulfillment** endpoints:
    - list entitlements
    - authorize download/version eligibility
-   - mint revocable download tokens / signed URLs (provider-backed)
+   - mint revocable download tokens (v1 default: token + proxy download; signed URLs optional by later ADR)
 5. Maintains an append-only **commerce ledger** (orders, payment events, entitlement grants, fulfillment events).
 
 ### 0.2 What you are not building (v1)
@@ -82,7 +82,8 @@ These are v1 decisions that the implementation MUST follow. Capture as ADRs in `
 1. **Entitlements are grants of commercial rights, not runtime authorization.**
 2. **Reference-first storage:** store references to external assets; do not copy execution logs/telemetry.
 3. **Webhook-driven state is idempotent:** payment events can arrive multiple times and out of order; processing must be safe.
-4. **Fulfillment uses revocable tokens:** do not ship perpetual bearer tokens without server checks.
+4. **Stripe is the v1 payment provider:** Stripe webhooks are the authoritative source of paid/refund/dispute transitions after signature verification (see `ADR-0003`).
+5. **Fulfillment uses token + proxy download (v1 default):** entitlement is re-checked at download time; signed URLs are optional and must be explicitly accepted via ADR (see `ADR-0004`).
 
 ---
 
@@ -91,7 +92,7 @@ These are v1 decisions that the implementation MUST follow. Capture as ADRs in `
 - **Product / SKU:** A sellable unit (e.g., spec pack, workflow template pack, agent bundle, add-on).
 - **Plan:** A pricing option for a product (one-time purchase or subscription).
 - **Order:** SpecPrompt’s internal record of a purchase attempt and its outcome.
-- **Payment Provider:** External system (e.g., Stripe) that performs checkout and emits webhooks.
+- **Payment Provider:** External system (Stripe in v1; see `spec_v1/adr/ADR-0003-stripe-payment-provider-and-order-transitions.md`) that performs checkout and emits webhooks.
 - **Payment Event:** Verified webhook event from the payment provider.
 - **Entitlement:** A grant to a subject (user in v1) indicating rights (download access, update eligibility, feature access).
 - **Eligibility Policy:** Rules for which versions/artifacts are available under an entitlement (e.g., “major version 1.x”, “updates while active”).
@@ -121,7 +122,7 @@ These are v1 decisions that the implementation MUST follow. Capture as ADRs in `
   - Fulfillment events
 - **Artifact Storage / Delivery**
   - Object storage for artifacts (recommended)
-  - Signed URLs or streaming proxy (optional v1)
+  - Token + streaming proxy download (v1 default); signed URLs optional by later ADR
 
 ### 4.2 Boundaries (hard rules)
 - SpecPrompt MUST NOT trust clients for:
@@ -219,7 +220,7 @@ Given a paid/active purchase event:
 2. SpecPrompt verifies:
    - user owns an active entitlement that covers the requested artifact/version
    - artifact exists and is available
-3. SpecPrompt issues a download token (Flow F) or returns a signed URL.
+3. SpecPrompt issues a download token (Flow F).
 
 **Invariants**
 - Authorization is server-side only.
@@ -228,11 +229,11 @@ Given a paid/active purchase event:
 ### Flow F — Download token redemption (user/tool → SpecPrompt/storage)
 Two acceptable v1 patterns:
 
-**Pattern F1 (recommended): signed URL minting**
-- SpecPrompt mints a time-bounded signed URL for object storage and returns it.
+**Pattern F2 (v1 default): SpecPrompt download proxy**
+- SpecPrompt issues a token and offers a download endpoint that streams from storage after token validation and entitlement re-checks at download time.
 
-**Pattern F2: SpecPrompt download proxy**
-- SpecPrompt issues a token and offers a download endpoint that streams from storage after token validation.
+**Pattern F1: signed URL minting (optional)**
+- SpecPrompt mints a time-bounded signed URL for object storage and returns it.
 
 **Invariants**
 - Tokens/URLs MUST be time-bounded.
@@ -456,13 +457,12 @@ Minimum required test suites (can be in `60_TESTING_ACCEPTANCE.md` later):
 ---
 
 ## 13) Open questions (must answer before v1 sign-off)
-1. Payment provider choice (Stripe vs alternative) and exact webhook event mapping.
-2. Artifact storage choice (S3/R2/etc.) and signed URL strategy.
-3. Eligibility policy standardization:
+1. Eligibility policy standardization:
    - which policies are supported in v1
    - how artifacts are tagged/versioned for eligibility
-4. Identity model:
+2. Identity model:
    - does SpecPrompt maintain its own `users` mapping or depend on shared identity middleware?
+3. Artifact storage choice (S3/R2/etc.) for fulfillment delivery.
 
 ---
 
@@ -480,7 +480,7 @@ SpecPrompt v1 is “done” when you can demonstrate, end-to-end:
 
 3. **Fulfillment**
    - User can list their entitlements.
-   - User can request a fulfillment download token or signed URL for an eligible artifact.
+   - User can request a fulfillment download token for an eligible artifact (token + proxy download).
    - Download succeeds and creates a fulfillment audit event.
 
 4. **Revocation**
