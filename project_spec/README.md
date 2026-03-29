@@ -248,6 +248,226 @@ defmodule SpecPrompt.Parser do
 end
 ```
 
+### 4.4 Formal Grammar (PEG)
+
+The SPEC.md format is defined by a Parsing Expression Grammar. Conforming parsers MUST accept documents matching this grammar:
+
+```peg
+SpecDocument  <- Frontmatter Section+ EOF
+Frontmatter   <- '---' NEWLINE YamlBlock '---' NEWLINE
+YamlBlock     <- (!('---' NEWLINE) .)*
+
+Section       <- RequiredSection / OptionalSection
+RequiredSection <- PurposeSection / CapabilitiesSection / ConstraintsSection / AcceptanceSection
+OptionalSection <- ArchitectureSection / DependenciesSection / ChangelogSection / CustomSection
+
+PurposeSection       <- '## Purpose' NEWLINE FreeText
+CapabilitiesSection  <- '## Capabilities' NEWLINE CapabilityLine+
+ConstraintsSection   <- '## Constraints' NEWLINE ConstraintLine+
+AcceptanceSection    <- '## Acceptance Tests' NEWLINE TestLine+
+ArchitectureSection  <- '## Architecture' NEWLINE FreeText
+DependenciesSection  <- '## Dependencies' NEWLINE DependencyLine+
+ChangelogSection     <- '## Changelog' NEWLINE ChangelogEntry+
+CustomSection        <- '## ' SectionName NEWLINE FreeText
+
+CapabilityLine  <- '- ' CapabilityId ':' Scope ' (' Description ')' NEWLINE
+CapabilityId    <- [a-z_]+
+Scope           <- [a-z_]+
+Description     <- (!NEWLINE .)+
+
+ConstraintLine  <- '- ' ConstraintText NEWLINE
+ConstraintText  <- 'Hard: ' (!NEWLINE .)+ / 'Soft: ' (!NEWLINE .)+ / (!NEWLINE .)+
+
+TestLine        <- '- Given ' Condition ' → ' Expected NEWLINE
+                 / '- When ' Condition ', then ' Expected NEWLINE
+Condition       <- (!(' → ' / ', then ') .)+
+Expected        <- (!NEWLINE .)+
+
+DependencyLine  <- '- ' DependencyName ' (' DependencyDetail ')' NEWLINE
+ChangelogEntry  <- '- ' Version ' (' Date '): ' ChangeDescription NEWLINE
+
+FreeText        <- (!('## ') .)+
+SectionName     <- (!NEWLINE .)+
+NEWLINE         <- '\r\n' / '\n'
+```
+
+### 4.5 Required Frontmatter Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | YES | Agent name, lowercase-hyphenated |
+| `version` | semver | YES | Semantic version (major.minor.patch) |
+| `runtime` | string | NO | Target runtime (opensentience, any, custom) |
+| `author` | string | YES | Team or person |
+| `created` | ISO-8601 | YES | Creation date |
+| `updated` | ISO-8601 | YES | Last modification date |
+| `tags` | string[] | NO | Categorization tags |
+| `dependencies` | string[] | NO | Named dependencies (MCP servers, APIs) |
+| `ampersand_ref` | string | NO | Path or URL to corresponding ampersand.json declaration |
+| `adl_ref` | string | NO | Path or URL to corresponding ADL agent definition (interop) |
+| `governance` | object | NO | Inline governance hints (maps to ampersand.json governance) |
+
+### 4.6 Parsed Spec Data Model (Ecto Schema)
+
+```elixir
+defmodule SpecPrompt.Spec do
+  use Ecto.Schema
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+
+  embedded_schema do
+    # Frontmatter
+    field :name, :string
+    field :version, :string
+    field :runtime, :string, default: "any"
+    field :author, :string
+    field :created, :date
+    field :updated, :date
+    field :tags, {:array, :string}, default: []
+    field :dependency_names, {:array, :string}, default: []
+    field :ampersand_ref, :string
+    field :adl_ref, :string
+
+    # Parsed sections
+    field :purpose, :string
+    embeds_many :capabilities, SpecPrompt.Capability
+    embeds_many :constraints, SpecPrompt.Constraint
+    embeds_many :acceptance_tests, SpecPrompt.AcceptanceTest
+    field :architecture, :string
+    embeds_many :dependencies, SpecPrompt.Dependency
+    embeds_many :changelog_entries, SpecPrompt.ChangelogEntry
+
+    # Validation metadata
+    field :parse_errors, {:array, :string}, default: []
+    field :parsed_at, :utc_datetime_usec
+  end
+end
+
+defmodule SpecPrompt.Capability do
+  use Ecto.Schema
+  embedded_schema do
+    field :capability, :string    # e.g. "orders"
+    field :scope, :string         # e.g. "read"
+    field :description, :string   # e.g. "look up order status"
+    field :maps_to, :string       # optional: &-prefixed capability key (e.g. "&memory.graph")
+  end
+end
+
+defmodule SpecPrompt.Constraint do
+  use Ecto.Schema
+  embedded_schema do
+    field :text, :string
+    field :type, Ecto.Enum, values: [:hard, :soft, :unclassified]
+    field :maps_to_governance, :string  # optional: maps to ampersand.json governance.hard or governance.soft
+  end
+end
+
+defmodule SpecPrompt.AcceptanceTest do
+  use Ecto.Schema
+  embedded_schema do
+    field :given, :string        # precondition
+    field :expected, :string     # expected behavior
+    field :format, Ecto.Enum, values: [:given_then, :when_then]
+  end
+end
+
+defmodule SpecPrompt.Dependency do
+  use Ecto.Schema
+  embedded_schema do
+    field :name, :string
+    field :type, :string         # "MCP server", "API", "spec"
+    field :location, :string     # URL, local path, or "remote: host"
+  end
+end
+
+defmodule SpecPrompt.ChangelogEntry do
+  use Ecto.Schema
+  embedded_schema do
+    field :version, :string
+    field :date, :date
+    field :description, :string
+  end
+end
+```
+
+### 4.7 Validation Rules (Normative)
+
+Parsers MUST enforce:
+
+1. Frontmatter present and valid YAML
+2. `name`, `version`, `author`, `created`, `updated` fields present
+3. `version` is valid semver
+4. All four required sections present: Purpose, Capabilities, Constraints, Acceptance Tests
+5. At least one capability, one constraint, and one acceptance test
+6. Capability lines match the `capability:scope (description)` format
+7. Acceptance test lines match `Given X → Y` or `When X, then Y` format
+8. If `ampersand_ref` is present, the referenced file must be valid ampersand.json
+
+Parsers SHOULD warn on:
+
+1. Empty sections (present but no content)
+2. Acceptance tests that don't reference any declared capability
+3. Constraints that use ambiguous language ("try to", "usually", "sometimes")
+4. Missing changelog for versions > 1.0.0
+
+### 4.8 Interoperability
+
+#### AGENTS.md Complementary Positioning
+
+SpecPrompt and AGENTS.md serve complementary roles:
+
+| Concern | AGENTS.md | SpecPrompt SPEC.md |
+|---------|-----------|-------------------|
+| **What it tells** | How to work in this codebase (commands, conventions, boundaries) | What this agent does and how to verify it works |
+| **Audience** | Coding agents (Copilot, Codex, Cursor) | Build pipelines, test frameworks, governance systems |
+| **Scope** | Per-project conventions | Per-agent behavioral specification |
+| **Testing** | No | Built-in acceptance criteria |
+| **Governance** | Boundaries only | Constraints + escalation + capability permissions |
+| **Versioning** | Implicit (git) | Explicit (semver in frontmatter) |
+
+**Integration pattern:** A project contains AGENTS.md (how to work here) + one or more SPEC.md files (what each agent does). Agentelic reads both: AGENTS.md for build conventions, SPEC.md for agent behavior specification.
+
+#### ADL Interoperability
+
+SpecPrompt can export to and import from Next Moca's Agent Definition Language:
+
+```bash
+# Export SpecPrompt → ADL
+specprompt export --format adl SPEC.md > agent.adl.json
+
+# Import ADL → SpecPrompt (generates scaffold SPEC.md from ADL definition)
+specprompt import --from adl agent.adl.json > SPEC.md
+```
+
+Mapping:
+
+| SpecPrompt | ADL |
+|-----------|-----|
+| `name` | `agent.name` |
+| `capabilities` | `tools` + `permissions` |
+| `constraints.hard` | `governance.constraints` |
+| `dependencies` | `dependencies` |
+| `version` | `version` |
+
+ADL covers agent *definition* (identity, tools, permissions). SpecPrompt adds *behavioral specification* (purpose, acceptance tests, architecture). Together they provide the complete agent description layer.
+
+#### ampersand.json Mapping
+
+SpecPrompt specs map bidirectionally to ampersand.json declarations:
+
+```bash
+# Generate ampersand.json from SPEC.md
+specprompt export --format ampersand SPEC.md > agent.ampersand.json
+
+# Validate SPEC.md against its linked ampersand.json
+specprompt validate --check-ampersand SPEC.md
+```
+
+The `ampersand_ref` frontmatter field links a spec to its [&] Protocol declaration. The validator checks that:
+- Every capability in SPEC.md has a corresponding `&`-prefixed binding in ampersand.json
+- Every hard constraint in SPEC.md appears in ampersand.json `governance.hard`
+- Every escalation condition in SPEC.md maps to ampersand.json `governance.escalate_when`
+
 ---
 
 ## 5. Ecosystem Integration
