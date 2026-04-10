@@ -482,6 +482,47 @@ The `ampersand_ref` frontmatter field links a spec to its [&] Protocol declarati
 
 ---
 
+## 5.1 PULSE Loop Manifest
+
+SpecPrompt is a **PULSE-conforming loop** under OS-010. As the standards layer it has the simplest loop in the portfolio: it does not host runtime cycles — its loop is the **spec lifecycle** (author → validate → test-gen → diff → publish). This makes SpecPrompt the easiest case study for PULSE adoption: a loop with no concurrency, no consensus, and no streaming.
+
+**Loop ID:** `specprompt.spec_lifecycle`
+**Loop name:** SpecPrompt Spec Lifecycle Loop
+**Version:** 0.1.0
+**Owner:** specprompt.com
+**Workspace scope:** optional
+
+**Phases (5 canonical kinds):**
+
+| Phase ID | Kind | Description |
+|---|---|---|
+| `retrieve_spec` | `retrieve` | Load SPEC.md from filesystem or git ref; resolve linked `ampersand.json` |
+| `route_action` | `route` | Choose next action: `validate`, `lint`, `test-gen`, `diff`, `publish` |
+| `act_transform` | `act` | Run the chosen toolchain command; emit derived artifact (test scaffold, diff report, manifest) |
+| `learn_lint` | `learn` | Update lint heuristics from author accept/reject of suggestions |
+| `consolidate_versions` | `consolidate` | Archive old SPEC.md versions, run version diff against ADL/ampersand.json siblings |
+
+**Closure:** `consolidate_versions → retrieve_spec` via git, guarantee `eventual`.
+
+**Cadence:** `manual` (CLI/MCP invocation). Fallback `event` (git pre-commit hook, CI trigger).
+
+**Substrates:**
+- `memory`: `graphonomous://workspace/{ws_id}` (lint heuristics, optional)
+- `policy`: optional
+- `audit`: git history (no Delegatic dependency)
+- `auth`: optional (filesystem-only by default)
+- `transport`: `mcp` + `cli`
+- `time`: optional
+
+**Invariants enabled:** `phase_atomicity`, `feedback_immutability` (git enforces), `outcome_grounding`, `trace_id_propagation` (CLI run id).
+
+**Cross-loop connections:**
+- `spec_to_agentelic` — emits `ConsolidationEvent` (spec published) from `consolidate_versions` to `agentelic.build_pipeline.retrieve_spec`
+
+**Why this matters:** SpecPrompt demonstrates that PULSE conformance has **zero infrastructure cost** for simple tools. A CLI that reads files, runs transforms, and writes git commits can declare a valid PULSE manifest with no runtime, no message bus, and no consensus engine. PULSE scales **down** as well as up.
+
+---
+
 ## 6. Gap Analysis & Competitive Landscape
 
 ### 6.1 Market Gap: No Standard Agent Spec Format
