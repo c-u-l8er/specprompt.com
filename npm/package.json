@@ -1,0 +1,38 @@
+{
+  "name": "@specprompt/parser",
+  "version": "0.1.0",
+  "description": "TypeScript parser for the SPEC.md format — the open standard for spec-driven AI development",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "specprompt",
+    "spec",
+    "agent",
+    "ai",
+    "sdd",
+    "spec-driven-development"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ampersandbox/specprompt"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.6.0",
+    "js-yaml": "^4.1.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}

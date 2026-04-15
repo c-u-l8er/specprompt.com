@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+    paths: ['lib/**', 'test/**', 'mix.exs', 'npm/**']
+  pull_request:
+    paths: ['lib/**', 'test/**', 'mix.exs', 'npm/**']
+
+jobs:
+  elixir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.17'
+          otp-version: '27'
+      - run: mix deps.get
+      - run: mix compile --warnings-as-errors
+      - run: mix format --check-formatted
+      - run: mix test
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: cd npm && npm install
+      - run: cd npm && npx tsc --noEmit
+      - run: cd npm && npm test

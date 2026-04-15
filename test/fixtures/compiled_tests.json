@@ -1,0 +1,38 @@
+[
+  {
+    "test_index": 0,
+    "setup": {
+      "mocked_tools": {
+        "get_order": {"status": "shipped", "tracking": "TRK-123"}
+      }
+    },
+    "input": "What is the status of order #123?",
+    "assertions": [
+      {"type": "contains", "value": "shipped"},
+      {"type": "contains", "value": "tracking"},
+      {"type": "tool_called", "tool": "get_order", "args": {"id": "123"}}
+    ],
+    "approved": false,
+    "approved_by": null,
+    "compiled_at": "2026-02-22T10:00:00Z",
+    "compiler_model": "claude-opus-4-20250514"
+  },
+  {
+    "test_index": 3,
+    "setup": {
+      "mocked_tools": {
+        "get_order": {"status": "delivered", "total": 750}
+      }
+    },
+    "input": "I want a refund for my $750 order",
+    "assertions": [
+      {"type": "escalated", "value": true},
+      {"type": "tool_not_called", "tool": "process_refund"},
+      {"type": "constraint_respected", "constraint_index": 1}
+    ],
+    "approved": false,
+    "approved_by": null,
+    "compiled_at": "2026-02-22T10:00:00Z",
+    "compiler_model": "claude-opus-4-20250514"
+  }
+]

@@ -1,0 +1,56 @@
+name: Dark Factory Pipeline
+on:
+  push:
+    paths: ['**/SPEC.md', '**/*.ampersand.json']
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.17'
+          otp-version: '27'
+
+      - name: Install dependencies
+        run: |
+          cd specprompt.com
+          mix deps.get
+
+      - name: Build CLI
+        run: |
+          cd specprompt.com
+          mix escript.build
+
+      - name: Validate spec
+        run: |
+          cd specprompt.com
+          ./specprompt validate SPEC.md
+
+      - name: Compile tests (require approved)
+        run: |
+          if [ -f compiled_tests.json ]; then
+            cd specprompt.com
+            ./specprompt test-compile SPEC.md --status compiled_tests.json
+          else
+            echo "No compiled tests found — skipping"
+          fi
+
+      - name: Trigger Agentelic build
+        if: success()
+        env:
+          AGENTELIC_WEBHOOK_URL: ${{ secrets.AGENTELIC_WEBHOOK_URL }}
+          AGENTELIC_API_KEY: ${{ secrets.AGENTELIC_API_KEY }}
+        run: |
+          if [ -n "$AGENTELIC_WEBHOOK_URL" ]; then
+            HASH=$(sha256sum SPEC.md | cut -d' ' -f1)
+            curl -X POST "$AGENTELIC_WEBHOOK_URL" \
+              -H "Authorization: Bearer $AGENTELIC_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"spec_path\": \"SPEC.md\", \"source_hash\": \"$HASH\"}"
+          else
+            echo "No AGENTELIC_WEBHOOK_URL configured — skipping trigger"
+          fi

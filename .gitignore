@@ -1,0 +1,17 @@
+# Elixir
+/_build/
+/deps/
+/specprompt
+*.beam
+erl_crash.dump
+
+# TypeScript
+/npm/node_modules/
+/npm/dist/
+
+# IDE
+.elixir_ls/
+.vscode/
+
+# OS
+.DS_Store

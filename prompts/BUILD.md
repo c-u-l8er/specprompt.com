@@ -224,10 +224,10 @@ This is the critical dark factory bridge — turning natural language acceptance
 
 ## Success Criteria
 
-- [ ] `specprompt validate` correctly validates the customer-support example (pass) and an invalid spec (fail with line numbers)
-- [ ] `specprompt test-compile` generates compilable assertions for all 8 acceptance tests in the example
-- [ ] `specprompt test-compile --approve` marks tests as approved
-- [ ] MCP server discovers tools via `tools/list` and executes all 8 tools
-- [ ] Supabase migration applies cleanly alongside existing `amp.*`, `kag.*`, `rune.*` schemas
-- [ ] TypeScript parser produces identical parse results to Elixir parser on all test fixtures
-- [ ] Pipeline trigger emits CloudEvents on spec publish
+- [x] `specprompt validate` correctly validates the customer-support example (pass) and an invalid spec (fail with line numbers)
+- [x] `specprompt test-compile` generates compilable assertions for all 8 acceptance tests in the example
+- [x] `specprompt test-compile --approve` marks tests as approved
+- [x] MCP server discovers tools via `tools/list` and executes all 8 tools
+- [x] Supabase migration applies cleanly alongside existing `amp.*`, `kag.*`, `rune.*` schemas
+- [x] TypeScript parser produces identical parse results to Elixir parser on all test fixtures
+- [x] Pipeline trigger emits CloudEvents on spec publish
