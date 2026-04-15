@@ -1,0 +1,24 @@
+<header class="border-b border-gray-800 bg-gray-900">
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <div class="flex items-center gap-8">
+        <a href={~p"/"} class="text-xl font-bold text-white tracking-tight">
+          SpecPrompt
+        </a>
+        <div class="flex gap-4">
+          <a href={~p"/validate"} class="text-sm text-gray-400 hover:text-white transition">
+            Validate
+          </a>
+          <a href={~p"/registry"} class="text-sm text-gray-400 hover:text-white transition">
+            Registry
+          </a>
+        </div>
+      </div>
+      <div class="text-xs text-gray-500 font-mono">v0.1.0</div>
+    </div>
+  </nav>
+</header>
+<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <.flash_group flash={@flash} />
+  {@inner_content}
+</main>

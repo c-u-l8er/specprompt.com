@@ -223,6 +223,11 @@ defmodule SpecPrompt.Registry do
     end)
   end
 
-  defp supabase_url, do: System.get_env("SUPABASE_URL")
-  defp supabase_key, do: System.get_env("SUPABASE_KEY")
+  defp supabase_url do
+    Application.get_env(:specprompt, :supabase_url) || System.get_env("SUPABASE_URL")
+  end
+
+  defp supabase_key do
+    Application.get_env(:specprompt, :supabase_key) || System.get_env("SUPABASE_KEY")
+  end
 end
