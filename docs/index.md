@@ -2,6 +2,8 @@
 
 > **Prompts are transient. Specs persist.**
 
+> **Part of the [&] Protocol stack** · [Ecosystem overview](../../ECOSYSTEM.md) · [Three-protocol stack](../../PULSE/docs/THREE_PROTOCOL_STACK.md) · [Stack status](../../STACK_COMPLETION.md)
+
 Welcome to the documentation hub for **SpecPrompt** — an open standard and
 toolchain for spec-driven AI development. SpecPrompt defines a Markdown-based
 specification format (SPEC.md) that is both human-readable and machine-parseable,
@@ -166,6 +168,8 @@ specification for building conformant parsers.
 ## Project Links
 
 - **Spec:** [Product Specification](spec/README.md)
+- **User stories:** [SpecPrompt User Stories](ux/user-stories.md)
+- **Build prompt:** [SpecPrompt Implementation Build Prompt](../prompts/BUILD.md)
 - **[&] Protocol ecosystem:** `AmpersandBoxDesign/`
 
 ---
