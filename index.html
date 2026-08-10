@@ -716,9 +716,11 @@
                     <strong>What that is not.</strong> It is the same implementation running on
                     two systems, not two independent implementations agreeing on a semantics.
                     The identity claim is only as strong as the single codebase that computes
-                    it, and both pieces were copied onto the booted image by hand — the T&amp;R
-                    build does not install them yet. The stronger claims are different claims,
-                    and this page has not made them.
+                    it. As of 2026-08-09 the guest is no longer hand-assembled — the T&amp;R
+                    build installs both pieces, and the machine that derived the string was
+                    created from that image and never touched afterwards. That removes a
+                    hand-copying caveat; it does not create a second implementation. The
+                    stronger claims are different claims, and this page has not made them.
                 </div>
             </div>
         </section>
@@ -746,7 +748,7 @@
                             <tr>
                                 <th scope="row">TRVM</th>
                                 <td class="ref">the term-rewrite runtime that reduces it</td>
-                                <td class="win">runs on T&amp;R · by hand</td>
+                                <td class="win">in the T&amp;R image</td>
                             </tr>
                             <tr>
                                 <th scope="row">trvs / TRAAVIIS</th>
