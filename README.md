@@ -15,14 +15,23 @@ figure below was measured that day with the command beside it.
 | | |
 |---|---|
 | Version | `0.1.0` (`mix.exs`, app `:specprompt`) |
-| Tests | **71 passing, 0 failures** — `mix test` |
+| Tests | **93 passing, 0 failures** — 71 Elixir (`mix test`) + 22 TypeScript (`npx vitest run` in `npm/`) |
 | Marketing page | **live** — `https://specprompt.com` answers 200 |
 | Application | **live on Fly** as app `specprompt` — `https://app.specprompt.com` answers 200 |
 | Evidence rung | `live_deployed` |
 
-**The test count is 71, not 93.** `COMPUTEDRIVEN_POSITIONING_PLAN.md` says 93;
-the suite says 71. The suite counts itself and the plan does not. Quote
-`mix test`; never hand-type this number.
+**Correction, 2026-08-17 — 71 and 93 are both right, of different things, and
+this file used to say one of them was wrong.** It read *"The test count is 71,
+not 93 … the suite says 71"*. Re-derived by running both suites: `mix test`
+prints **71 tests, 0 failures**, and `npx vitest run` in `npm/` prints
+**22 passed**. 71 + 22 = **93**. The plan's figure was the whole repository and
+`mix test` is the Elixir half of it — a scope collision, not a stale number, and
+the same shape as the 103-vs-118 law counts on `opensentience.org`. The earlier
+diagnosis would have made the landing page understate itself by 22 tests.
+
+**Never hand-type either number.** `build-site.mjs` executes both runners on
+every build, parses what they print, and refuses to emit the landing page if a
+count has moved off `records/tests.json`.
 
 **What is live is the prior design.** The marketing page describes
 content-addressed spec identity. What is deployed predates that, which is why

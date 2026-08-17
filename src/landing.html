@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When are two specs the same spec? — SpecPrompt</title>
+<meta name="description" content="The industry agreed the spec is the source of truth. SpecPrompt is about the question that stayed open: when are two specs the same spec? A spec's meaning would be a canonical graph and its identity a string any machine can derive. The compiler that would do that is not built, and this page says so beside everything that is.">
+<meta name="falsifiable-question" content="{{QUESTION}}">
+<link rel="canonical" href="{{ORIGIN}}/">
+<meta name="theme-color" content="#050a13">
+<meta property="og:title" content="When are two specs the same spec? — SpecPrompt">
+<meta property="og:description" content="Identity, not diff review. What is measured is published with its witness; what is not is listed as not, at the size it actually is.">
+<meta property="og:type" content="website"><meta property="og:url" content="{{ORIGIN}}/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050a13'/%3E%3Cpath d='M8 0v32M16 0v32M24 0v32M0 8h32M0 16h32M0 24h32' stroke='%236ea8dc' stroke-width='.75' opacity='.45'/%3E%3Cpath d='M6 20h3.5v6H6zM11 14h3.5v12H11zM16 17h3.5v9H16zM21 11h3.5v15H21z' fill='%235ad1c8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script type="module" src="/amp-nav.js"></script>
+<style>{{CSS}}</style></head><body>
+{{BAND}}
+<amp-nav property="specprompt"></amp-nav>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+
+<div class="top"><a class="logo" href="/">spec<span>prompt</span></a>
+<nav><a href="#unsettled">The question</a><a href="#runs">What runs</a><a href="#open">What does not</a><a href="#status">Status</a><a href="{{SPEC_URL}}">The format &uarr;</a><a class="btn" href="{{APP_ORIGIN}}">Open the toolchain</a></nav></div>
+
+<main id="main">
+
+<!-- SHELL.md §8 + r9: the identifying animation is ABOVE THE FOLD, inside the
+     first section, and it comes after the <h1> in source order because the
+     question comes first. It renders no data and asserts nothing — /derive.js
+     takes no input from this document and writes nothing back into it. Delete
+     both script tags and every word, figure, chip, row and the correction form
+     are still here and still work. -->
+<section class="hero">
+<div class="front">
+<div class="eyebrow">The question this site exists to answer</div>
+<h1>When are two specs <em>the same spec?</em></h1>
+<p class="lede">The industry spent 2025 agreeing that the spec — not the prompt, not the code — is the source of truth. That argument is over, and it was never the hard part. <strong>Rename a variable and the diff lights up though nothing changed. Weaken an acceptance criterion and the diff is one line among forty.</strong> A spec whose meaning is a canonical graph has a name you can derive, and then <em>did the meaning change</em> is a string comparison a machine can run. Nothing on this domain does that yet, and the section that says why is on this page rather than in a footnote.</p>
+<p><a class="btn" href="#unsettled">Read the argument</a>&nbsp;&nbsp;<a class="btn ghost" href="#open">See what is not built</a></p>
+</div>
+<div class="idanim" aria-hidden="true"><canvas data-identity-animation></canvas></div>
+</section>
+
+{{PLATE}}
+
+<section id="settled">
+<div class="eyebrow">The settled question</div>
+<h2>Specs won. We are not here to reargue it.</h2>
+<p class="lede">By mid-2026 every major coding agent ships some flavour of spec-driven development and the phrase of the year is <em>the spec is the prompt</em>. Good. That consensus is the starting condition, not the product — because every one of those specs is prose. Structured Markdown, held together by convention and good intentions, reviewed by a person. The tools disagree about format and lifecycle and agree completely about substance.</p>
+<p class="lede">Which leaves the two hardest questions untouched: <strong>when are two specs the same spec</strong>, and <strong>what shows a run obeyed one?</strong> A review meeting answers the first. A passing suite is a sample, not a record of what happened, and that is the second. We think both deserve arithmetic.</p>
+</section>
+
+<section id="unsettled">
+<div class="eyebrow">The one idea</div>
+<h2>Identity, not diff review.</h2>
+<p class="lede">A spec canonicalizes to a graph; the graph derives a name. Reformat the document, reorder the clauses, rename freely — the name holds. Change what the spec <em>claims</em> and the name moves. The figure below is that property drawn out, using the one identity this stack has actually measured.</p>
+{{IDENT}}
+</section>
+
+<section id="runs">
+<div class="eyebrow">What is running, and at which rung</div>
+<h2>Three things exist here, at three different rungs, so they are not in one list.</h2>
+<p class="lede">A single status for this domain would be false in one direction or the other. One artifact answers on a deployed host, one is a pair of parsers with test suites, one is a document. The rung chip on each says which.</p>
+{{ARTIFACTS}}
+</section>
+
+<section id="open">
+<div class="eyebrow">What is not established</div>
+<h2>The compiler that would join the two halves of this page does not exist.</h2>
+<p class="lede">The machinery derives identities from canonical graphs. The front end parses Markdown (§3) and speaks MCP (§4.2). <strong>Nothing turns one into the other</strong>, so today a SpecPrompt spec is a validated document and not a checksummed one. Stated first, at full size, because it is the thing a reader would otherwise assume works.</p>
+{{OPEN_CARDS}}
+</section>
+
+<section id="evidence">
+<div class="eyebrow">Evidence, re-run at build time</div>
+<h2>Every count below was produced by running the suite, not typed onto this page.</h2>
+<p class="lede">This build shells out to <code>mix test</code> and to <code>vitest</code>, parses what they print, and <strong>refuses to emit the page</strong> if either number disagrees with the frozen record beside it. A count cannot be hand-written onto this site; the only way to move one is to change what the tests do.</p>
+{{TESTS_TABLE}}
+<p class="lede sm">{{METHOD_NOTE}}</p>
+<h2 class="mt">And the rows that are a name rather than a thing.</h2>
+<p class="lede">Same table shape, honest column. <code>built &middot; superseded</code> is used where something is deployed and running but replaced by the argument above — taking neither credit for it nor pretending it was never there.</p>
+{{PIECES_TABLE}}
+</section>
+
+<section id="status">
+<div class="eyebrow">Status</div>
+<h2>Where this stands, and what would move it.</h2>
+{{STATUS}}
+{{ZEROS}}
+{{RETRACTION}}
+</section>
+
+<section id="do">
+<div class="eyebrow">What you can actually do here</div>
+<h2>Three rungs, three lists. Nothing asks you to use what is not built.</h2>
+{{CTA}}
+</section>
+
+<section id="say">
+<div class="eyebrow">Corrections</div>
+<h2>If a number on this page is wrong, that is the message we most want.</h2>
+<p class="lede">This page is generated from a record and gated, which catches a value that drifted from its witness. It cannot catch a witness that was wrong to begin with. If you maintain specs for agents and <em>did the meaning change</em> costs your team meetings, that is also worth hearing — it shapes what the compiler would have to accept.</p>
+{{FORM}}
+</section>
+
+</main>
+</div>
+<footer><div class="in">
+<span class="stamp">{{STAMP}}</span>
+<span class="links"><a href="{{APP_ORIGIN}}">Toolchain</a><a href="{{REPO}}">Source</a><a href="{{SPEC_URL}}">Format</a><a href="{{ISSUES}}">File a correction</a><a href="https://fleetprompt.com">Sibling: fleetprompt</a></span>
+</div>
+<div class="attrib">This page is generated from <code>records/surface.json</code> and from the test suites themselves, and <code>launch-gate.mjs</code> refuses to publish it when the artifact and the records disagree. Its whole content ships with zero JavaScript &mdash; the correction form posts without it, the portfolio nav and the identifying animation are the only scripts, and the animation reads nothing from this page and writes nothing to it. &copy; {{YEAR}} SpecPrompt, a {{PARENT}} site.</div>
+</footer>
+<script src="/derive.js" defer></script>
+<script src="/form.js" defer></script>
+</body></html>

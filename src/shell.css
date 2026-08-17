@@ -1,0 +1,242 @@
+/* ==========================================================================
+   The ComputeDriven page shell, revision shell-r8.
+
+   Everything between TOKENS-START and TOKENS-END is this site's own character
+   and is the only part a sibling surface replaces. Everything after
+   TOKENS-END is shared structure. Documented in ProjectAmp2/agents/SHELL.md.
+
+   Carries the r7 corrections from the first line:
+     · `.top nav a:not(.btn)` — the unscoped rule beat `.btn` on all nine
+       surfaces built before this one and painted the header CTA in --fg2 on
+       the accent. `:not(.btn)` fixes today's instance; r8 says fix the CLASS,
+       so launch-gate.mjs RESOLVES THE CASCADE over the emitted artifact —
+       specificity, then source order, !important and @media included — and
+       refuses when any button's colour is decided by a non-button rule.
+     · the h1 line-height clears Spectral's ink box at the largest clamp step,
+       measured against a canvas TextMetrics rather than assumed. 1.02 is safe
+       in one display face and clips a descender in another.
+   ========================================================================== */
+/* TOKENS-START — SpecPrompt: drafting blue on blueprint ink */
+:root{
+--ink:#050a13;--ink2:#0a1220;--ink3:#0e1728;          /* page · surface · raised */
+--line:rgba(190,214,240,.1);--line2:rgba(190,214,240,.2);
+/* fg2 .66 measures 8.0:1 on the lightest surface here, fg3 .55 measures 6.0:1.
+   The shell shipped fg3 at .34 for a while, which is 2.78:1 — a caveat nobody
+   can read is not a caveat. launch-gate.mjs recomputes every declared pair and
+   refuses below 4.5:1, so neither can drift back. SHELL.md §0. */
+--fg:#e9edf3;--fg2:rgba(233,237,243,.66);--fg3:rgba(233,237,243,.55);
+/* The accent is drafting-pencil blue: this site is about a document that has
+   been made mechanical. Deliberately clear of the five rung-chip hues, which
+   are role colours and have to stay legible as roles, and deliberately not the
+   green this site used to use for identity strings — green is the
+   live_deployed chip. */
+--acc:#6ea8dc;--acc-soft:rgba(110,168,220,.1);--acc-line:rgba(110,168,220,.34);
+--acc-ink:#04101c;
+--data:#5ad1c8;--data-soft:rgba(90,209,200,.1);--warn:#f5c451;
+--display:"Spectral",Georgia,"Times New Roman",serif;
+--ui:"Space Grotesk",system-ui,-apple-system,sans-serif;
+--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+--r:10px;--rl:16px
+}
+/* TOKENS-END */
+
+:root{--wrap:1080px;--xs:.6875rem;--sm:.8125rem;--md:1.0625rem;--lg:1.25rem;
+--h2:clamp(1.7rem,4vw,2.5rem);--h1:clamp(2.15rem,6vw,3.7rem)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ink);color:var(--fg);font:.9375rem/1.62 var(--ui);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+h1,h2,h3{margin:0}
+img,canvas,svg{max-width:100%}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 22px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--ink3);color:var(--fg);padding:10px 16px;z-index:200;border-radius:var(--r)}
+.skip:focus{left:8px;top:8px}
+.skip:hover{color:var(--acc)}
+
+/* --- placement band ---
+   specprompt is amp-nav place:3 and this page embeds <amp-nav> immediately
+   below, so the band says what the nav says: "a specification in the
+   ComputeDriven world". The layer sentence belongs to place 2 only.
+   .covers is 11px and load-bearing — it is the span that keeps the rung chip
+   honest — so it takes --fg2, never --fg3. SHELL.md §0, §1. */
+.band{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:11px 22px;background:var(--ink2);border-bottom:1px solid var(--line);font-size:var(--xs)}
+.band .where{color:var(--fg2);text-transform:uppercase;letter-spacing:.05em}
+.band .where b{color:var(--fg);font-weight:600}
+.band .covers{color:var(--fg2);flex:1 1 320px;min-width:0}
+.band .spec-link{color:var(--acc);text-decoration:none;white-space:nowrap;font-family:var(--mono)}
+.band .spec-link:hover{text-decoration:underline}
+.rung{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:var(--xs);padding:2px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--fg2);white-space:nowrap}
+.rung::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.rung[data-rung=spec]{color:#9aa4b2;border-color:rgba(154,164,178,.35)}
+.rung[data-rung=in_tree]{color:#7aa2f7;border-color:rgba(122,162,247,.35)}
+.rung[data-rung=live_local]{color:var(--data);border-color:rgba(90,209,200,.4);background:var(--data-soft)}
+.rung[data-rung=live_deployed]{color:#4ade80;border-color:rgba(74,222,128,.4)}
+.rung[data-rung=external]{color:#c4a1ff;border-color:rgba(196,161,255,.4)}
+.rung[data-rung="?"]{color:var(--warn);border-color:rgba(245,196,81,.45);border-style:dashed}
+
+/* --- nav ---
+   r7: `.top nav a` is specificity 0,2,1 and `.btn` is 0,1,0, so an unscoped
+   nav rule WINS over the button and paints --fg2 on --acc. Every surface built
+   before this one shipped an unreadable header CTA that way. Scope the nav
+   rule rather than raising .btn — raising .btn would only move the collision. */
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.logo{font-family:var(--mono);font-size:var(--md);font-weight:700;letter-spacing:-.03em;color:var(--fg);text-decoration:none;white-space:nowrap}
+.logo span{color:var(--acc)}
+.logo:hover{color:var(--acc)}
+.top nav{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.top nav a:not(.btn){color:var(--fg2);text-decoration:none;font-size:var(--sm);font-weight:500;white-space:nowrap}
+.top nav a:not(.btn):hover{color:var(--acc)}
+.btn{display:inline-block;background:var(--acc);color:var(--acc-ink);font-weight:700;border-radius:var(--r);padding:11px 20px;text-decoration:none;font-size:var(--sm);white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line2);font-weight:500}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost:hover{border-color:var(--acc-line);color:var(--acc);filter:none}
+/* SHELL.md r6: the breakpoint is the SURFACE's, not the shell's — r5 measured
+   430px against a four-item nav. MEASURED on this surface: with six items the
+   logo is stranded against a two-row nav at 780 and the row is clean by 800,
+   so the value here is 800px. It subsumes 430. */
+@media(max-width:800px){.top{flex-direction:column;align-items:flex-start;gap:11px}.top nav{width:100%}}
+
+/* --- the identifying animation (SHELL.md §8) ---
+   Absolutely positioned so it can neither move nor delay the h1; the section
+   clips it so it can never widen the document; masked so the lede stays
+   readable where they overlap. */
+.hero{position:relative;overflow:hidden}
+.hero .front{position:relative;z-index:1}
+.idanim{position:absolute;z-index:0;top:0;bottom:0;right:-24px;left:auto;width:min(45vw,430px);pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle at 54% 50%,#000 44%,transparent 78%);
+  mask-image:radial-gradient(circle at 54% 50%,#000 44%,transparent 78%)}
+.idanim canvas{display:block;width:100%;height:100%}
+@media(min-width:861px){.hero .lede{max-width:min(53ch,58%)}}
+/* Narrow: the animation sits behind the whole hero rather than beside it, so
+   it must not compete with the lede. MEASURED at 390x844 — at .22 it was in
+   frame and effectively invisible, which satisfies "there is one" and fails
+   "you can see it". .32 reads as present without touching the text's legibility. */
+@media(max-width:860px){.idanim{right:-22%;width:min(88vw,430px);opacity:.32}}
+
+/* --- sections --- */
+section{padding:54px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.eyebrow{font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.14em;color:var(--acc);display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.eyebrow::before{content:"";width:20px;height:1px;background:var(--acc);opacity:.6;flex:none}
+/* r7: MEASURED, not assumed. Spectral at the top clamp step (3.7rem = 59.2px)
+   renders an ink box of ascent+descent ≈ 60.3px against a 1.02 line box of
+   60.4px — inside by a tenth of a pixel, which is not a margin. 1.12 gives a
+   66.3px line box and clears the ink by ~6px, so a descender in the h1 cannot
+   collide with the cap-height of the line beneath it. */
+h1{font-family:var(--display);font-weight:600;font-size:var(--h1);line-height:1.12;letter-spacing:-.02em;max-width:17ch;text-wrap:balance}
+h1 em{font-style:italic;color:var(--acc)}
+h2{font-family:var(--display);font-weight:600;font-size:var(--h2);line-height:1.18;letter-spacing:-.012em;text-wrap:balance}
+h3{font-size:var(--md);font-weight:600}
+.lede{color:var(--fg2);font-size:var(--md);line-height:1.66;max-width:62ch;margin:14px 0 0}
+p{margin:14px 0 0}
+strong{color:var(--fg);font-weight:600}
+
+/* --- cards ---
+   Separators are each cell's own 1px shadow filling the grid gap, NOT a
+   container background showing through: the background trick leaves a phantom
+   lit rectangle whenever the last row is short. SHELL.md §6. */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--ink2);border:1px solid var(--line);border-radius:var(--rl);overflow:hidden;margin-top:28px}
+.grid>div{background:var(--ink2);padding:22px;min-width:0;box-shadow:0 0 0 1px var(--line)}
+.grid h3{margin-bottom:8px}
+.grid p{margin:0;color:var(--fg2);font-size:var(--sm);line-height:1.6}
+.grid .head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}
+.grid .head h3{margin:0}
+.needs{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line2);font-family:var(--mono);font-size:var(--xs);color:var(--fg3);line-height:1.6;overflow-wrap:anywhere}
+.needs b{color:var(--fg2);font-weight:500}
+.where-tag{font-family:var(--mono);font-size:var(--xs);color:var(--data);white-space:nowrap}
+
+/* --- count plate --- */
+.plate{grid-template-columns:repeat(auto-fit,minmax(156px,1fr))}
+.plate>div{text-align:center;padding:22px 12px}
+.plate .n{font-family:var(--mono);font-weight:700;font-size:1.5rem;color:var(--fg)}
+.plate .l{font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-top:5px}
+.sm{font-size:var(--sm)}
+
+/* --- status block --- */
+.status{border:1px solid var(--line2);border-radius:var(--rl);background:var(--ink2);overflow:hidden;margin-top:26px}
+.status>div{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:15px 20px;border-top:1px solid var(--line);min-width:0}
+.status>div:first-child{border-top:0}
+.status dt{font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.1em;color:var(--fg3);margin:0}
+.status dd{margin:0;font-size:var(--sm);color:var(--fg2);line-height:1.6;min-width:0;overflow-wrap:anywhere}
+.status dd strong{color:var(--fg);font-weight:600}
+.status .limit{background:rgba(245,196,81,.05)}
+.status .limit dt{color:var(--warn)}
+
+/* --- evidence table — wide content scrolls in its own box, never the
+   document. SHELL.md §6. --- */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);margin-top:22px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-family:var(--mono);font-size:var(--xs)}
+th,td{text-align:left;padding:10px 15px;border-top:1px solid var(--line);white-space:nowrap}
+th{color:var(--fg3);text-transform:uppercase;letter-spacing:.09em;font-weight:500;background:var(--ink3);border-top:0}
+td.place{white-space:normal;font-family:var(--ui);color:var(--fg);min-width:180px}
+td.num{color:var(--data);text-align:right}
+td.st{color:var(--fg2)}
+td.st b{color:var(--warn);font-weight:500}
+td.st i{color:var(--data);font-style:normal}
+
+/* --- specprompt's own figure: one identity, two orderings ---
+   Static markup, no script. A diagram of what a derivable name would mean,
+   drawn from the record's single measured identity. */
+.ident{margin-top:26px;border:1px solid var(--line);border-radius:var(--rl);background:var(--ink2);overflow:hidden}
+.ident .row{display:grid;grid-template-columns:1fr auto;gap:14px 20px;align-items:center;padding:16px 20px;border-top:1px solid var(--line)}
+.ident .row:first-child{border-top:0}
+.ident .clauses{display:flex;flex-wrap:wrap;gap:7px;min-width:0}
+.ident .cl{font-family:var(--mono);font-size:var(--xs);color:var(--fg2);border:1px solid var(--line2);border-radius:6px;padding:3px 9px;white-space:nowrap}
+.ident .cl.moved{border-color:var(--acc-line);color:var(--acc);background:var(--acc-soft)}
+.ident .cl.changed{border-color:rgba(245,196,81,.45);border-style:dashed;color:var(--warn);background:rgba(245,196,81,.06)}
+.ident .id{font-family:var(--mono);font-size:var(--sm);color:var(--data);white-space:nowrap}
+.ident .id.moved{color:var(--warn)}
+.ident .note{padding:16px 20px;border-top:1px solid var(--line);background:var(--ink3);font-size:var(--sm);color:var(--fg2);line-height:1.65}
+@media(max-width:640px){.ident .row{grid-template-columns:1fr}}
+
+/* --- claim tag + retraction --- */
+.tag{display:inline-block;font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.06em;color:var(--warn);background:rgba(245,196,81,.06);border:1px dashed rgba(245,196,81,.35);border-radius:6px;padding:5px 11px;margin-bottom:16px}
+.tag.ok{color:var(--data);border-color:rgba(90,209,200,.35);background:var(--data-soft)}
+.retract{border-left:3px solid var(--warn);background:rgba(245,196,81,.05);border-radius:0 var(--r) var(--r) 0;padding:20px;max-width:74ch;margin-top:26px}
+.retract h3{color:var(--warn);font-size:.9375rem}
+.retract p{font-size:var(--sm);color:var(--fg2);line-height:1.7}
+code{font-family:var(--mono);font-size:.92em;background:rgba(190,214,240,.07);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+
+/* --- CTA, keyed to rung --- */
+.cta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.cta a{display:block;background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:20px;text-decoration:none;transition:border-color .2s,background .2s,transform .2s;min-width:0}
+.cta a:hover{border-color:var(--acc-line);background:var(--acc-soft);transform:translateY(-2px)}
+.cta .verb{display:block;font-family:var(--mono);font-size:var(--xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--acc);margin-bottom:7px}
+.cta .what{display:block;font-size:var(--sm);line-height:1.55;color:var(--fg2)}
+.cta code{color:var(--data);background:none;padding:0}
+.ctagroup+.ctagroup{margin-top:34px}
+
+/* --- the correction form (SHELL.md r9) ---
+   A real form that posts with scripting off; src/form.js only upgrades it to
+   an inline reply. Ruled by Travis: this endpoint, this shape. */
+.say{margin-top:26px;border:1px solid var(--line2);border-radius:var(--rl);background:var(--ink2);padding:22px}
+.say-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.say-f{display:block;min-width:0}
+.say-f span{display:block;font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.1em;color:var(--fg3);margin-bottom:7px}
+.say input,.say textarea{width:100%;background:var(--ink);color:var(--fg);border:1px solid var(--line2);border-radius:var(--r);padding:11px 13px;font:var(--sm)/1.5 var(--ui);font-size:var(--sm)}
+.say textarea{resize:vertical;min-height:76px}
+.say input::placeholder,.say textarea::placeholder{color:var(--fg3)}
+.say input:hover,.say textarea:hover{border-color:var(--acc-line)}
+.say input:focus,.say textarea:focus{border-color:var(--acc);outline:none}
+.say input[name=_gotcha]{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.say-act{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:16px}
+.say-act button{background:var(--acc);color:var(--acc-ink);font-family:var(--ui);font-weight:700;font-size:var(--sm);border:1px solid var(--acc);border-radius:var(--r);padding:11px 22px;cursor:pointer}
+.say-act button:hover{filter:brightness(1.12)}
+.say-act button:disabled{opacity:.55;cursor:default;filter:none}
+.say-msg{margin:0;font-size:var(--sm);color:var(--fg2);min-height:1.2em}
+.say-msg.ok{color:var(--data)}
+.say-msg.bad{color:var(--warn)}
+.alt{margin-top:14px;font-size:var(--sm);color:var(--fg3)}
+
+/* --- footer --- */
+footer{border-top:1px solid var(--line);background:var(--ink2);margin-top:54px}
+footer .in{max-width:var(--wrap);margin:0 auto;padding:26px 22px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;font-size:var(--xs);color:var(--fg3)}
+footer a{color:var(--fg2);text-decoration:none}
+footer a:hover{color:var(--acc)}
+footer .links{display:flex;flex-wrap:wrap;gap:20px}
+.stamp{font-family:var(--mono);color:var(--fg3)}
+.attrib{max-width:var(--wrap);margin:0 auto;padding:0 22px 26px;font-size:var(--xs);color:var(--fg3);line-height:1.6}
+
+@media(max-width:640px){.status>div{grid-template-columns:1fr;gap:6px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}

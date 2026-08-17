@@ -1,0 +1,24 @@
+{
+  "schema": "computedriven-tests-v1",
+  "_comment": "Frozen by build-site.mjs on first run. Every value is re-derived by RUNNING the suites on every subsequent build and the build refuses on any disagreement. Do not hand-edit: if a suite changes what it counts, that is an event, not a typo.",
+  "frozen_at": "2026-08-17",
+  "total": 93,
+  "suites": [
+    {
+      "id": "elixir",
+      "label": "Elixir · mix test",
+      "runner": "ExUnit",
+      "total": 71,
+      "failures": 0,
+      "excluded": 0
+    },
+    {
+      "id": "typescript",
+      "label": "TypeScript · vitest",
+      "runner": "vitest",
+      "total": 22,
+      "failures": 0,
+      "excluded": 0
+    }
+  ]
+}

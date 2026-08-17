@@ -1,911 +1,136 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SpecPrompt — a spec you can checksum</title>
-        <meta
-            name="description"
-            content="SpecPrompt is the specification layer of the ComputeDriven stack: specs whose meaning is a content-addressed canonical graph with a derivable identity. Same string, same spec — on any machine that can derive it. Most of it is not built, and this page says which parts."
-        />
-        <meta
-            name="keywords"
-            content="spec-driven development, specification, WRL, TRVM, semantic identity, content-addressed, canonical graph, replayable, agent specification"
-        />
-        <meta property="og:title" content="SpecPrompt — a spec you can checksum" />
-        <meta
-            property="og:description"
-            content="The industry agreed the spec is the source of truth. The open question is when two specs are the same. Here, a spec's identity is a string you can derive."
-        />
-        <meta property="og:type" content="website" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
-            rel="stylesheet"
-        />
-        <link
-            rel="icon"
-            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050a13'/%3E%3Cpath d='M8 0v32M16 0v32M24 0v32M0 8h32M0 16h32M0 24h32' stroke='%236ea8dc' stroke-width='.75' opacity='.45'/%3E%3Cpath d='M7 17l6 6L26 9' fill='none' stroke='%2358e07a' stroke-width='3'/%3E%3C/svg%3E"
-        />
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When are two specs the same spec? — SpecPrompt</title>
+<meta name="description" content="The industry agreed the spec is the source of truth. SpecPrompt is about the question that stayed open: when are two specs the same spec? A spec's meaning would be a canonical graph and its identity a string any machine can derive. The compiler that would do that is not built, and this page says so beside everything that is.">
+<meta name="falsifiable-question" content="When are two specs the same spec?">
+<link rel="canonical" href="https://specprompt.com/">
+<meta name="theme-color" content="#050a13">
+<meta property="og:title" content="When are two specs the same spec? — SpecPrompt">
+<meta property="og:description" content="Identity, not diff review. What is measured is published with its witness; what is not is listed as not, at the size it actually is.">
+<meta property="og:type" content="website"><meta property="og:url" content="https://specprompt.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23050a13'/%3E%3Cpath d='M8 0v32M16 0v32M24 0v32M0 8h32M0 16h32M0 24h32' stroke='%236ea8dc' stroke-width='.75' opacity='.45'/%3E%3Cpath d='M6 20h3.5v6H6zM11 14h3.5v12H11zM16 17h3.5v9H16zM21 11h3.5v15H21z' fill='%235ad1c8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script type="module" src="/amp-nav.js"></script>
+<style>:root{--ink:#050a13;--ink2:#0a1220;--ink3:#0e1728;          --line:rgba(190,214,240,.1);--line2:rgba(190,214,240,.2);--fg:#e9edf3;--fg2:rgba(233,237,243,.66);--fg3:rgba(233,237,243,.55);--acc:#6ea8dc;--acc-soft:rgba(110,168,220,.1);--acc-line:rgba(110,168,220,.34);--acc-ink:#04101c;--data:#5ad1c8;--data-soft:rgba(90,209,200,.1);--warn:#f5c451;--display:"Spectral",Georgia,"Times New Roman",serif;--ui:"Space Grotesk",system-ui,-apple-system,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--r:10px;--rl:16px}:root{--wrap:1080px;--xs:.6875rem;--sm:.8125rem;--md:1.0625rem;--lg:1.25rem;--h2:clamp(1.7rem,4vw,2.5rem);--h1:clamp(2.15rem,6vw,3.7rem)}*{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;background:var(--ink);color:var(--fg);font:.9375rem/1.62 var(--ui);overflow-x:hidden;-webkit-font-smoothing:antialiased}a{color:var(--acc)}h1,h2,h3{margin:0}img,canvas,svg{max-width:100%}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.wrap{max-width:var(--wrap);margin:0 auto;padding:0 22px}.skip{position:absolute;left:-9999px;top:0;background:var(--ink3);color:var(--fg);padding:10px 16px;z-index:200;border-radius:var(--r)}.skip:focus{left:8px;top:8px}.skip:hover{color:var(--acc)}.band{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:11px 22px;background:var(--ink2);border-bottom:1px solid var(--line);font-size:var(--xs)}.band .where{color:var(--fg2);text-transform:uppercase;letter-spacing:.05em}.band .where b{color:var(--fg);font-weight:600}.band .covers{color:var(--fg2);flex:1 1 320px;min-width:0}.band .spec-link{color:var(--acc);text-decoration:none;white-space:nowrap;font-family:var(--mono)}.band .spec-link:hover{text-decoration:underline}.rung{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:var(--xs);padding:2px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--fg2);white-space:nowrap}.rung::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.rung[data-rung=spec]{color:#9aa4b2;border-color:rgba(154,164,178,.35)}.rung[data-rung=in_tree]{color:#7aa2f7;border-color:rgba(122,162,247,.35)}.rung[data-rung=live_local]{color:var(--data);border-color:rgba(90,209,200,.4);background:var(--data-soft)}.rung[data-rung=live_deployed]{color:#4ade80;border-color:rgba(74,222,128,.4)}.rung[data-rung=external]{color:#c4a1ff;border-color:rgba(196,161,255,.4)}.rung[data-rung="?"]{color:var(--warn);border-color:rgba(245,196,81,.45);border-style:dashed}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}.logo{font-family:var(--mono);font-size:var(--md);font-weight:700;letter-spacing:-.03em;color:var(--fg);text-decoration:none;white-space:nowrap}.logo span{color:var(--acc)}.logo:hover{color:var(--acc)}.top nav{display:flex;gap:20px;align-items:center;flex-wrap:wrap}.top nav a:not(.btn){color:var(--fg2);text-decoration:none;font-size:var(--sm);font-weight:500;white-space:nowrap}.top nav a:not(.btn):hover{color:var(--acc)}.btn{display:inline-block;background:var(--acc);color:var(--acc-ink);font-weight:700;border-radius:var(--r);padding:11px 20px;text-decoration:none;font-size:var(--sm);white-space:nowrap}.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line2);font-weight:500}.btn:hover{filter:brightness(1.12)}.btn.ghost:hover{border-color:var(--acc-line);color:var(--acc);filter:none}@media(max-width:800px){.top{flex-direction:column;align-items:flex-start;gap:11px}.top nav{width:100%}}.hero{position:relative;overflow:hidden}.hero .front{position:relative;z-index:1}.idanim{position:absolute;z-index:0;top:0;bottom:0;right:-24px;left:auto;width:min(45vw,430px);pointer-events:none;-webkit-mask-image:radial-gradient(circle at 54% 50%,#000 44%,transparent 78%);mask-image:radial-gradient(circle at 54% 50%,#000 44%,transparent 78%)}.idanim canvas{display:block;width:100%;height:100%}@media(min-width:861px){.hero .lede{max-width:min(53ch,58%)}}@media(max-width:860px){.idanim{right:-22%;width:min(88vw,430px);opacity:.32}}section{padding:54px 0;border-top:1px solid var(--line)}section:first-of-type{border-top:0}.eyebrow{font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.14em;color:var(--acc);display:flex;align-items:center;gap:11px;margin-bottom:14px}.eyebrow::before{content:"";width:20px;height:1px;background:var(--acc);opacity:.6;flex:none}h1{font-family:var(--display);font-weight:600;font-size:var(--h1);line-height:1.12;letter-spacing:-.02em;max-width:17ch;text-wrap:balance}h1 em{font-style:italic;color:var(--acc)}h2{font-family:var(--display);font-weight:600;font-size:var(--h2);line-height:1.18;letter-spacing:-.012em;text-wrap:balance}h3{font-size:var(--md);font-weight:600}.lede{color:var(--fg2);font-size:var(--md);line-height:1.66;max-width:62ch;margin:14px 0 0}p{margin:14px 0 0}strong{color:var(--fg);font-weight:600}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--ink2);border:1px solid var(--line);border-radius:var(--rl);overflow:hidden;margin-top:28px}.grid>div{background:var(--ink2);padding:22px;min-width:0;box-shadow:0 0 0 1px var(--line)}.grid h3{margin-bottom:8px}.grid p{margin:0;color:var(--fg2);font-size:var(--sm);line-height:1.6}.grid .head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}.grid .head h3{margin:0}.needs{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line2);font-family:var(--mono);font-size:var(--xs);color:var(--fg3);line-height:1.6;overflow-wrap:anywhere}.needs b{color:var(--fg2);font-weight:500}.where-tag{font-family:var(--mono);font-size:var(--xs);color:var(--data);white-space:nowrap}.plate{grid-template-columns:repeat(auto-fit,minmax(156px,1fr))}.plate>div{text-align:center;padding:22px 12px}.plate .n{font-family:var(--mono);font-weight:700;font-size:1.5rem;color:var(--fg)}.plate .l{font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-top:5px}.sm{font-size:var(--sm)}.status{border:1px solid var(--line2);border-radius:var(--rl);background:var(--ink2);overflow:hidden;margin-top:26px}.status>div{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:15px 20px;border-top:1px solid var(--line);min-width:0}.status>div:first-child{border-top:0}.status dt{font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.1em;color:var(--fg3);margin:0}.status dd{margin:0;font-size:var(--sm);color:var(--fg2);line-height:1.6;min-width:0;overflow-wrap:anywhere}.status dd strong{color:var(--fg);font-weight:600}.status .limit{background:rgba(245,196,81,.05)}.status .limit dt{color:var(--warn)}.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);margin-top:22px}table{border-collapse:collapse;width:100%;min-width:640px;font-family:var(--mono);font-size:var(--xs)}th,td{text-align:left;padding:10px 15px;border-top:1px solid var(--line);white-space:nowrap}th{color:var(--fg3);text-transform:uppercase;letter-spacing:.09em;font-weight:500;background:var(--ink3);border-top:0}td.place{white-space:normal;font-family:var(--ui);color:var(--fg);min-width:180px}td.num{color:var(--data);text-align:right}td.st{color:var(--fg2)}td.st b{color:var(--warn);font-weight:500}td.st i{color:var(--data);font-style:normal}.ident{margin-top:26px;border:1px solid var(--line);border-radius:var(--rl);background:var(--ink2);overflow:hidden}.ident .row{display:grid;grid-template-columns:1fr auto;gap:14px 20px;align-items:center;padding:16px 20px;border-top:1px solid var(--line)}.ident .row:first-child{border-top:0}.ident .clauses{display:flex;flex-wrap:wrap;gap:7px;min-width:0}.ident .cl{font-family:var(--mono);font-size:var(--xs);color:var(--fg2);border:1px solid var(--line2);border-radius:6px;padding:3px 9px;white-space:nowrap}.ident .cl.moved{border-color:var(--acc-line);color:var(--acc);background:var(--acc-soft)}.ident .cl.changed{border-color:rgba(245,196,81,.45);border-style:dashed;color:var(--warn);background:rgba(245,196,81,.06)}.ident .id{font-family:var(--mono);font-size:var(--sm);color:var(--data);white-space:nowrap}.ident .id.moved{color:var(--warn)}.ident .note{padding:16px 20px;border-top:1px solid var(--line);background:var(--ink3);font-size:var(--sm);color:var(--fg2);line-height:1.65}@media(max-width:640px){.ident .row{grid-template-columns:1fr}}.tag{display:inline-block;font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.06em;color:var(--warn);background:rgba(245,196,81,.06);border:1px dashed rgba(245,196,81,.35);border-radius:6px;padding:5px 11px;margin-bottom:16px}.tag.ok{color:var(--data);border-color:rgba(90,209,200,.35);background:var(--data-soft)}.retract{border-left:3px solid var(--warn);background:rgba(245,196,81,.05);border-radius:0 var(--r) var(--r) 0;padding:20px;max-width:74ch;margin-top:26px}.retract h3{color:var(--warn);font-size:.9375rem}.retract p{font-size:var(--sm);color:var(--fg2);line-height:1.7}code{font-family:var(--mono);font-size:.92em;background:rgba(190,214,240,.07);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}.cta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.cta a{display:block;background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:20px;text-decoration:none;transition:border-color .2s,background .2s,transform .2s;min-width:0}.cta a:hover{border-color:var(--acc-line);background:var(--acc-soft);transform:translateY(-2px)}.cta .verb{display:block;font-family:var(--mono);font-size:var(--xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--acc);margin-bottom:7px}.cta .what{display:block;font-size:var(--sm);line-height:1.55;color:var(--fg2)}.cta code{color:var(--data);background:none;padding:0}.ctagroup+.ctagroup{margin-top:34px}.say{margin-top:26px;border:1px solid var(--line2);border-radius:var(--rl);background:var(--ink2);padding:22px}.say-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.say-f{display:block;min-width:0}.say-f span{display:block;font-family:var(--mono);font-size:var(--xs);text-transform:uppercase;letter-spacing:.1em;color:var(--fg3);margin-bottom:7px}.say input,.say textarea{width:100%;background:var(--ink);color:var(--fg);border:1px solid var(--line2);border-radius:var(--r);padding:11px 13px;font:var(--sm)/1.5 var(--ui);font-size:var(--sm)}.say textarea{resize:vertical;min-height:76px}.say input::placeholder,.say textarea::placeholder{color:var(--fg3)}.say input:hover,.say textarea:hover{border-color:var(--acc-line)}.say input:focus,.say textarea:focus{border-color:var(--acc);outline:none}.say input[name=_gotcha]{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}.say-act{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:16px}.say-act button{background:var(--acc);color:var(--acc-ink);font-family:var(--ui);font-weight:700;font-size:var(--sm);border:1px solid var(--acc);border-radius:var(--r);padding:11px 22px;cursor:pointer}.say-act button:hover{filter:brightness(1.12)}.say-act button:disabled{opacity:.55;cursor:default;filter:none}.say-msg{margin:0;font-size:var(--sm);color:var(--fg2);min-height:1.2em}.say-msg.ok{color:var(--data)}.say-msg.bad{color:var(--warn)}.alt{margin-top:14px;font-size:var(--sm);color:var(--fg3)}footer{border-top:1px solid var(--line);background:var(--ink2);margin-top:54px}footer .in{max-width:var(--wrap);margin:0 auto;padding:26px 22px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;font-size:var(--xs);color:var(--fg3)}footer a{color:var(--fg2);text-decoration:none}footer a:hover{color:var(--acc)}footer .links{display:flex;flex-wrap:wrap;gap:20px}.stamp{font-family:var(--mono);color:var(--fg3)}.attrib{max-width:var(--wrap);margin:0 auto;padding:0 22px 26px;font-size:var(--xs);color:var(--fg3);line-height:1.6}@media(max-width:640px){.status>div{grid-template-columns:1fr;gap:6px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}</style></head><body>
+<div class="band" data-tier="3"><span class="where">SpecPrompt is <b>a specification</b> in the ComputeDriven world</span><span class="rung" data-rung="live_deployed" title="spec · in_tree · live_local · live_deployed · external">live_deployed</span><span class="covers">That rung covers the SPEC.md toolchain at app.specprompt.com — the prior design, which parses, validates and lints prose specs and answers MCP over POST /mcp. It does not cover the content-addressed identity this page argues for: the compiler that would give a spec a derivable name is not built, so no spec served from this domain has one.</span><a class="spec-link" href="https://docs.ampersandboxdesign.com/#/specprompt.com/docs/spec/README.md">the specification &rarr;</a></div>
+<amp-nav property="specprompt"></amp-nav>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
 
-        <style>
-            :root {
-                --bg: #050a13;
-                --surface: #0a1220;
-                --surface-2: #0e1728;
-                --grid: rgba(110, 168, 220, 0.06);
-                --border: rgba(110, 168, 220, 0.18);
-                --border-soft: rgba(233, 237, 243, 0.08);
-                --text: #e9edf3;
-                --dim: #93a1b8;
-                --muted: #4d5a70;
-                --blue: #6ea8dc;
-                --sem: #58e07a;
-                --amber: #f2c14e;
-                --red: #ff5c5c;
-                --serif: "Spectral", Georgia, "Times New Roman", serif;
-                --sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
-                --mono: "JetBrains Mono", ui-monospace, monospace;
-                --max-w: 1040px;
-                --gutter: clamp(1.25rem, 4vw, 3rem);
-            }
+<div class="top"><a class="logo" href="/">spec<span>prompt</span></a>
+<nav><a href="#unsettled">The question</a><a href="#runs">What runs</a><a href="#open">What does not</a><a href="#status">Status</a><a href="https://docs.ampersandboxdesign.com/#/specprompt.com/docs/spec/README.md">The format &uarr;</a><a class="btn" href="https://app.specprompt.com">Open the toolchain</a></nav></div>
 
-            *,
-            *::before,
-            *::after {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
+<main id="main">
 
-            html {
-                scroll-behavior: smooth;
-                -webkit-font-smoothing: antialiased;
-            }
-            @media (prefers-reduced-motion: reduce) {
-                html {
-                    scroll-behavior: auto;
-                }
-                * {
-                    transition: none !important;
-                }
-            }
+<!-- SHELL.md §8 + r9: the identifying animation is ABOVE THE FOLD, inside the
+     first section, and it comes after the <h1> in source order because the
+     question comes first. It renders no data and asserts nothing — /derive.js
+     takes no input from this document and writes nothing back into it. Delete
+     both script tags and every word, figure, chip, row and the correction form
+     are still here and still work. -->
+<section class="hero">
+<div class="front">
+<div class="eyebrow">The question this site exists to answer</div>
+<h1>When are two specs <em>the same spec?</em></h1>
+<p class="lede">The industry spent 2025 agreeing that the spec — not the prompt, not the code — is the source of truth. That argument is over, and it was never the hard part. <strong>Rename a variable and the diff lights up though nothing changed. Weaken an acceptance criterion and the diff is one line among forty.</strong> A spec whose meaning is a canonical graph has a name you can derive, and then <em>did the meaning change</em> is a string comparison a machine can run. Nothing on this domain does that yet, and the section that says why is on this page rather than in a footnote.</p>
+<p><a class="btn" href="#unsettled">Read the argument</a>&nbsp;&nbsp;<a class="btn ghost" href="#open">See what is not built</a></p>
+</div>
+<div class="idanim" aria-hidden="true"><canvas data-identity-animation></canvas></div>
+</section>
 
-            body {
-                background:
-                    linear-gradient(var(--grid) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-                    var(--bg);
-                background-size:
-                    36px 36px,
-                    36px 36px,
-                    auto;
-                color: var(--text);
-                font-family: var(--sans);
-                font-size: 17px;
-                line-height: 1.65;
-                overflow-x: hidden;
-            }
+<div class="grid plate"><div><div class="n">93 tests</div><div class="l">Re-run by this build</div></div><div><div class="n">2 parsers</div><div class="l">Independent implementations, both ours</div></div><div><div class="n">0</div><div class="l">Specs on this domain with a derivable identity</div></div><div><div class="n">0</div><div class="l">Implementations of the semantics that are not ours</div></div></div>
 
-            /* family texture: the same quiet grain as computedriven.com */
-            body::after {
-                content: "";
-                position: fixed;
-                inset: 0;
-                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-                pointer-events: none;
-                z-index: 9999;
-            }
+<section id="settled">
+<div class="eyebrow">The settled question</div>
+<h2>Specs won. We are not here to reargue it.</h2>
+<p class="lede">By mid-2026 every major coding agent ships some flavour of spec-driven development and the phrase of the year is <em>the spec is the prompt</em>. Good. That consensus is the starting condition, not the product — because every one of those specs is prose. Structured Markdown, held together by convention and good intentions, reviewed by a person. The tools disagree about format and lifecycle and agree completely about substance.</p>
+<p class="lede">Which leaves the two hardest questions untouched: <strong>when are two specs the same spec</strong>, and <strong>what shows a run obeyed one?</strong> A review meeting answers the first. A passing suite is a sample, not a record of what happened, and that is the second. We think both deserve arithmetic.</p>
+</section>
 
-            a {
-                color: var(--blue);
-                text-decoration: none;
-                border-bottom: 1px solid rgba(110, 168, 220, 0.3);
-                transition: border-color 0.15s;
-            }
-            a:hover {
-                border-bottom-color: var(--blue);
-            }
-            :focus-visible {
-                outline: 2px solid var(--sem);
-                outline-offset: 3px;
-            }
-            .skip {
-                position: absolute;
-                left: -9999px;
-                top: 0;
-                background: var(--surface);
-                color: var(--text);
-                padding: 0.6rem 1rem;
-                z-index: 200;
-            }
-            .skip:focus {
-                left: 0.5rem;
-                top: 0.5rem;
-            }
+<section id="unsettled">
+<div class="eyebrow">The one idea</div>
+<h2>Identity, not diff review.</h2>
+<p class="lede">A spec canonicalizes to a graph; the graph derives a name. Reformat the document, reorder the clauses, rename freely — the name holds. Change what the spec <em>claims</em> and the name moves. The figure below is that property drawn out, using the one identity this stack has actually measured.</p>
+<div class="ident">
+<div class="row"><div class="clauses"><span class="cl">purpose</span><span class="cl">capabilities</span><span class="cl">constraints</span><span class="cl">acceptance</span><span class="cl">architecture</span></div><div class="id">sem-8ae91fe9cbc5fd08</div></div>
+<div class="row"><div class="clauses"><span class="cl moved">architecture</span><span class="cl moved">acceptance</span><span class="cl">purpose</span><span class="cl moved">constraints</span><span class="cl">capabilities</span></div><div class="id">sem-8ae91fe9cbc5fd08</div></div>
+<div class="row"><div class="clauses"><span class="cl">purpose</span><span class="cl">capabilities</span><span class="cl changed">constraints, weakened</span><span class="cl">acceptance</span><span class="cl">architecture</span></div><div class="id moved">&hellip; a different string</div></div>
+<p class="note">Reordering is free; the name holds. Weakening a constraint is not; the name moves, and a machine notices without being told what to look at. <strong>That is the design, and the top two rows are the only part of it anything has actually run</strong> &mdash; sem-8ae91fe9cbc5fd08 was derived on arch/linux · build workstation and again on t&amp;r · freebsd 15 guest, engine v0.7.0-alpha.5, on 2026-08-09. Two operating systems, one implementation: a portability result, not a semantics result. The third row is a drawing of a compiler nobody has written.</p>
+</div>
+</section>
 
-            .wrap {
-                max-width: var(--max-w);
-                margin: 0 auto;
-                padding: 0 var(--gutter);
-            }
+<section id="runs">
+<div class="eyebrow">What is running, and at which rung</div>
+<h2>Three things exist here, at three different rungs, so they are not in one list.</h2>
+<p class="lede">A single status for this domain would be false in one direction or the other. One artifact answers on a deployed host, one is a pair of parsers with test suites, one is a document. The rung chip on each says which.</p>
+<div class="grid"><div><div class="head"><h3>The SPEC.md toolchain</h3><span class="rung" data-rung="live_deployed" title="spec · in_tree · live_local · live_deployed · external">live_deployed</span></div><p>Parser, validator, linter, differ, a CLI and eight MCP tools for the prose SPEC.md format. It is real, it is running, and it is the design this page argues past — built for the world where a spec is a document a person reviews.</p><div class="needs"><b>Where:</b> <span class="where-tag">app.specprompt.com</span><br><b>Witness:</b> GET / returns 200 and renders a registry page naming its own MCP endpoint. POST /mcp returns 406 without an event-stream Accept header and a JSON-RPC error envelope with one. Measured 2026-08-17.</div></div><div><div class="head"><h3>Two reference parsers</h3><span class="rung" data-rung="in_tree" title="spec · in_tree · live_local · live_deployed · external">in_tree</span></div><p>The same format parsed twice, in Elixir and in TypeScript, so that the format is a format rather than one program's habits. This is the strongest thing in the repository and it is still one team's work.</p><div class="needs"><b>Where:</b> <span class="where-tag">lib/ and npm/</span><br><b>Witness:</b> Both suites run in under a second on a laptop and the counts on this page are re-run by the build, not typed into it.</div></div><div><div class="head"><h3>The SPEC.md specification</h3><span class="rung" data-rung="spec" title="spec · in_tree · live_local · live_deployed · external">spec</span></div><p>The format document: frontmatter fields, the eight canonical sections, a PEG grammar, normative validation rules, and the interoperability section that says what a second implementation has to agree about.</p><div class="needs"><b>Where:</b> <span class="where-tag">docs/spec/README.md</span><br><b>Witness:</b> A document. Nothing in it runs, and the section this page leans on hardest — the join from Markdown to a canonical graph — describes a compiler that has never been written.</div></div></div>
+</section>
 
-            code {
-                font-family: var(--mono);
-                font-size: 0.85em;
-                background: var(--surface-2);
-                border: 1px solid var(--border-soft);
-                border-radius: 3px;
-                padding: 0.1em 0.35em;
-            }
+<section id="open">
+<div class="eyebrow">What is not established</div>
+<h2>The compiler that would join the two halves of this page does not exist.</h2>
+<p class="lede">The machinery derives identities from canonical graphs. The front end parses Markdown (§3) and speaks MCP (§4.2). <strong>Nothing turns one into the other</strong>, so today a SpecPrompt spec is a validated document and not a checksummed one. Stated first, at full size, because it is the thing a reader would otherwise assume works.</p>
+<div class="grid"><div><div class="head"><h3>The Markdown to WRL compiler</h3><span class="rung" data-rung="spec" title="spec · in_tree · live_local · live_deployed · external">spec</span></div><p>The join between the two halves of this domain. The machinery derives identities from canonical graphs; the front end parses Markdown; nothing turns one into the other. Until it exists, a SpecPrompt spec is a validated document and not a checksummed one.</p><div class="needs"><b>Needs:</b> A compiler that maps the eight SPEC.md sections onto a canonical graph, plus a reason to believe the mapping is the right one. <b>Built:</b> named and shaped, zero lines.</div></div><div><div class="head"><h3>Diff by identity</h3><span class="rung" data-rung="spec" title="spec · in_tree · live_local · live_deployed · external">spec</span></div><p>The whole point of a derivable name: reformat a spec and the string holds, weaken an acceptance criterion and it moves, so CI can answer did the meaning change with a string comparison instead of a review meeting.</p><div class="needs"><b>Needs:</b> The compiler above. This is downstream of it and cannot be built first. <b>Built:</b> no.</div></div><div><div class="head"><h3>A second independent implementation</h3><span class="rung" data-rung="spec" title="spec · in_tree · live_local · live_deployed · external">spec</span></div><p>Same identity on two machines currently means one codebase agreeing with itself. Two operating systems is a portability result, not a semantics result, and this page has never claimed otherwise.</p><div class="needs"><b>Needs:</b> Anyone deriving the same string from the same canonical graph with code we did not write. <b>Built:</b> no.</div></div><div><div class="head"><h3>Whether anyone wants this</h3><span class="rung" data-rung="spec" title="spec · in_tree · live_local · live_deployed · external">spec</span></div><p>Whether working engineers will accept a graph with a checksum over prose they can skim is untested with anyone but us. The Markdown front end exists precisely because we suspect the answer is no.</p><div class="needs"><b>Needs:</b> A team that is not us maintaining specs this way for long enough to complain about it. <b>Built:</b> no.</div></div><div><div class="head"><h3>Drift detection at more than demo size</h3><span class="rung" data-rung="spec" title="spec · in_tree · live_local · live_deployed · external">spec</span></div><p>Catching spec-versus-implementation drift by identity has run against exactly one world. Every claim about how it scales is extrapolated from a sample of one.</p><div class="needs"><b>Needs:</b> More than one world, and preferably one nobody here authored. <b>Built:</b> once, on a demo.</div></div></div>
+</section>
 
-            .sem {
-                color: var(--sem);
-                font-family: var(--mono);
-            }
+<section id="evidence">
+<div class="eyebrow">Evidence, re-run at build time</div>
+<h2>Every count below was produced by running the suite, not typed onto this page.</h2>
+<p class="lede">This build shells out to <code>mix test</code> and to <code>vitest</code>, parses what they print, and <strong>refuses to emit the page</strong> if either number disagrees with the frozen record beside it. A count cannot be hand-written onto this site; the only way to move one is to change what the tests do.</p>
+<div class="scroll"><table><thead><tr><th>Suite</th><th>Ran</th><th>Failed</th><th>Excluded</th><th>Provenance</th></tr></thead><tbody><tr><td class="place">Elixir · mix test</td><td class="num">71 tests</td><td class="num">0 failing</td><td class="num">0 excluded</td><td class="st"><i>re-run by this build</i></td></tr><tr><td class="place">TypeScript · vitest</td><td class="num">22 tests</td><td class="num">0 failing</td><td class="num">0 excluded</td><td class="st"><i>re-run by this build</i></td></tr><tr><td class="place"><strong>Both suites</strong></td><td class="num">93 tests</td><td class="num">0 failing</td><td class="num">0 excluded</td><td class="st"><i>the frozen record and the run agree</i></td></tr></tbody></table></div>
+<p class="lede sm">Each row was produced by executing the suite named in it and parsing what the runner printed &mdash; <code>mix test</code> against the Elixir toolchain in <code>lib/</code>, and <code>npx vitest run</code> against the TypeScript parser in <code>npm/</code>. Two parsers of one format (§4.8) is the strongest claim in this repository and it is still one team&rsquo;s work. The counts are re-derived on every build; the frozen record beside them is what they are checked against, never their source.</p>
+<h2 class="mt">And the rows that are a name rather than a thing.</h2>
+<p class="lede">Same table shape, honest column. <code>built &middot; superseded</code> is used where something is deployed and running but replaced by the argument above — taking neither credit for it nor pretending it was never there.</p>
+<div class="scroll"><table><thead><tr><th>Piece</th><th>What it is</th><th>Status &mdash; measured or admitted</th></tr></thead><tbody><tr><td class="place">WRL</td><td class="st">the spec language — meaning as a canonical graph</td><td class="st"><i>real · upstream</i></td></tr><tr><td class="place">TRVM</td><td class="st">the term-rewrite runtime that reduces it</td><td class="st"><i>in the T&amp;R image</i></td></tr><tr><td class="place">trvs / TRAAVIIS</td><td class="st">seals a run into a replayable film</td><td class="st"><i>alpha · v0.7.0-alpha.5</i></td></tr><tr><td class="place">Identity check</td><td class="st">the same sem- id derived on two operating systems</td><td class="st"><i>measured · once</i></td></tr><tr><td class="place">SPEC.md toolchain</td><td class="st">parser, validator, linter, differ, a CLI and eight MCP tools, live on its own host</td><td class="st"><b>built · superseded</b></td></tr><tr><td class="place">Spec registry</td><td class="st">publish and browse specs — deployed, and without films</td><td class="st"><b>built · superseded</b></td></tr><tr><td class="place">Markdown → WRL compiler</td><td class="st">prose in, identity out — the join between the two halves of this page</td><td class="st"><b>not built</b></td></tr><tr><td class="place">Diff by identity</td><td class="st">“did the meaning change?” as a string comparison</td><td class="st"><b>not built</b></td></tr><tr><td class="place">Second implementation</td><td class="st">independent derivation of the same identities</td><td class="st"><b>not built</b></td></tr></tbody></table></div>
+</section>
 
-            /* ---------- nav ---------- */
-            nav {
-                position: sticky;
-                top: 0;
-                z-index: 100;
-                background: rgba(5, 10, 19, 0.85);
-                backdrop-filter: blur(12px);
-                border-bottom: 1px solid var(--border-soft);
-            }
-            nav .wrap {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 1rem;
-                height: 62px;
-            }
-            .brand {
-                font-family: var(--mono);
-                font-weight: 700;
-                font-size: 0.9rem;
-                letter-spacing: 0.06em;
-                color: var(--text);
-                border: none;
-                display: flex;
-                align-items: center;
-                gap: 0.6rem;
-            }
-            .brand .mark {
-                width: 16px;
-                height: 16px;
-                flex: none;
-            }
-            .brand b {
-                color: var(--blue);
-                font-weight: 700;
-            }
-            .navlinks {
-                display: flex;
-                gap: 1.5rem;
-                font-size: 0.82rem;
-                font-family: var(--mono);
-                letter-spacing: 0.03em;
-            }
-            .navlinks a {
-                color: var(--dim);
-                border: none;
-            }
-            .navlinks a:hover {
-                color: var(--blue);
-            }
-            @media (max-width: 700px) {
-                .navlinks {
-                    display: none;
-                }
-            }
+<section id="status">
+<div class="eyebrow">Status</div>
+<h2>Where this stands, and what would move it.</h2>
+<dl class="status">
+<div><dt>Status</dt><dd><strong>live_deployed</strong> &mdash; The SPEC.md toolchain is deployed and answering. app.specprompt.com returns 200, its health-bearing MCP endpoint at POST /mcp returns a well-formed JSON-RPC error rather than a web-server error, and the two reference parsers this repository ships agree with their own suites.</dd></div>
+<div><dt>Last verified</dt><dd>2026-08-17</dd></div>
+<div><dt>Source</dt><dd>Four measurements on 2026-08-17. (1) mix test in specprompt.com — 71 tests, 0 failures. (2) npx vitest run in specprompt.com/npm — 22 tests, 0 failures. (3) curl https://app.specprompt.com/ — 200. (4) curl -X POST https://app.specprompt.com/mcp with a JSON-RPC tools/list body — 406 without an event-stream Accept header, and with one a JSON-RPC envelope carrying code -32600, which is the MCP server refusing an uninitialised session rather than a page failing to serve.</dd></div>
+<div class="limit"><dt>Limit</dt><dd>This establishes that the prior toolchain runs on this domain and that two parsers agree with the tests written for them. It does not establish the claim this page is built on — that a spec has a derivable identity — because no compiler joins the Markdown front end to WRL. It does not establish that the deployed MCP server does anything useful past refusing an uninitialised call; no tool was invoked end to end. And the one identity measured across two operating systems was derived by a single implementation twice, which is not two implementations agreeing.</dd></div>
+<div><dt>Next rung</dt><dd><strong>external</strong> &mdash; A second implementation, written by someone who is not us, that derives the same sem- identity from the same canonical graph — or a spec whose identity this one gets wrong. Either moves the semantics off self-report. Nothing else will, and shipping the compiler will not: it would make the claim testable, not tested.</dd></div>
+</dl>
+<dl class="status"><div><dt>Specs on this domain with a derivable identity</dt><dd><strong>0.</strong> The deployed toolchain validates prose. The compiler that would give a validated document a content-addressed name is not built, so nothing served here has one — including this page's own claims.</dd></div><div><dt>Implementations of the semantics that are not ours</dt><dd><strong>0.</strong> One codebase derived the demo world's identity on two operating systems. That is the same program run twice. A second implementation is what would turn a portability result into a semantics result.</dd></div></dl>
+<div class="retract"><h3>Retraction &mdash; two things this page used to say</h3>
+<p><strong>It claimed a layer.</strong> The previous hero eyebrow read <code>The specification layer of the ComputeDriven stack</code>. <code>ampersand-nav</code> files this domain as a <em>specification</em> in that world rather than a layer of it, and this page embeds that nav one element below the band &mdash; so the page was contradicting, on screen, the component rendered immediately beneath it. The band now says what the nav says. If the placement is wrong, the fix is in the nav, which this repository does not own.</p>
+<p><strong>It published an email address.</strong> <code>hello@computedriven.com</code> stood in the footer of the page this replaces. Corrections now go through the form above, which posts to the endpoint the parent site uses, and through this repository&rsquo;s issues. No <code>mailto:</code> and no address in the markup &mdash; the gate refuses both.</p>
+<p><strong>And the retraction the earlier page made, which stands.</strong> An earlier specprompt.com carried a quarterly roadmap whose dates passed without the format they promised, and an ecosystem diagram of a pipeline its products had never run end to end. The dates were removed rather than refreshed to a later quarter. What is left is measured, linked to something you can run, or marked <code>not built</code> &mdash; and where a thing is deployed but replaced by the argument on this page, it says <code>built &middot; superseded</code> rather than taking credit or pretending it was never there.</p></div>
+</section>
 
-            /* ---------- hero ---------- */
-            header {
-                position: relative;
-                padding: clamp(4rem, 11vw, 7.5rem) 0 clamp(3rem, 7vw, 5rem);
-                border-bottom: 1px solid var(--border-soft);
-            }
-            .eyebrow {
-                font-family: var(--mono);
-                font-size: 0.78rem;
-                letter-spacing: 0.22em;
-                text-transform: uppercase;
-                color: var(--muted);
-                margin-bottom: 1.4rem;
-            }
-            h1 {
-                font-family: var(--serif);
-                font-weight: 600;
-                font-size: clamp(2.3rem, 6vw, 3.9rem);
-                line-height: 1.08;
-                letter-spacing: -0.01em;
-                max-width: 18ch;
-            }
-            h1 em {
-                font-style: italic;
-                color: var(--sem);
-            }
-            .lede {
-                margin-top: 1.6rem;
-                max-width: 62ch;
-                color: var(--dim);
-                font-size: 1.02rem;
-            }
-            .lede strong {
-                color: var(--text);
-                font-weight: 600;
-            }
+<section id="do">
+<div class="eyebrow">What you can actually do here</div>
+<h2>Three rungs, three lists. Nothing asks you to use what is not built.</h2>
+<div class="ctagroup"><div class="tag ok">live_deployed &mdash; answering on its own host, checked with curl</div><div class="cta"><a href="https://app.specprompt.com" target="_blank" rel="noopener"><span class="verb">Use the deployed artifact</span><span class="what">The SPEC.md toolchain. It validates and lints prose specs and answers MCP at <code>POST /mcp</code>. It is the design this page argues past, and it is the part of this domain that runs.</span></a></div></div><div class="ctagroup"><div class="tag ok">in_tree &mdash; two parsers and their suites, not a running service</div><div class="cta"><a href="https://github.com/c-u-l8er/specprompt.com" target="_blank" rel="noopener"><span class="verb">Inspect the source</span><span class="what">The Elixir toolchain in <code>lib/</code> and the TypeScript parser in <code>npm/</code> &mdash; one format read by two programs, which is the only reason to believe it is a format.</span></a><a href="https://github.com/c-u-l8er/specprompt.com" target="_blank" rel="noopener"><span class="verb">Run the tests</span><span class="what"><code>mix test</code> and <code>npx vitest run</code>. Both finish in about a second. The counts in the table above are what your machine should print.</span></a></div></div><div class="ctagroup"><div class="tag">spec &mdash; a document, and the compiler it describes is unwritten</div><div class="cta"><a href="https://docs.ampersandboxdesign.com/#/specprompt.com/docs/spec/README.md" target="_blank" rel="noopener"><span class="verb">Read</span><span class="what">The format: frontmatter, the canonical sections (§3), the toolchain (§4), and §4.8, which is where it says what a second implementation has to agree about.</span></a><a href="https://github.com/c-u-l8er/specprompt.com/issues" target="_blank" rel="noopener"><span class="verb">Challenge</span><span class="what">Two specs you think are the same spec, and a reason. Disagreement about what should hash equal is more useful to us right now than agreement about what does.</span></a><a href="https://github.com/c-u-l8er/specprompt.com" target="_blank" rel="noopener"><span class="verb">Implement</span><span class="what">A third parser, in any language. Two implementations that agree are one team&rsquo;s habits; the point of §4.8 is that the third one is written by somebody else.</span></a></div></div>
+</section>
 
-            /* the signature: an identity ledger — two machines, one string */
-            .ledger {
-                margin-top: 3rem;
-                border: 1px solid var(--border);
-                background: linear-gradient(180deg, var(--surface), rgba(10, 18, 32, 0.4));
-                max-width: 720px;
-            }
-            .ledger .head {
-                display: flex;
-                justify-content: space-between;
-                align-items: baseline;
-                gap: 1rem;
-                padding: 0.7rem 1.1rem;
-                border-bottom: 1px solid var(--border-soft);
-                font-family: var(--mono);
-                font-size: 0.72rem;
-                letter-spacing: 0.14em;
-                text-transform: uppercase;
-                color: var(--muted);
-            }
-            .ledger .head b {
-                color: var(--sem);
-                font-weight: 500;
-            }
-            .lrow {
-                display: flex;
-                align-items: baseline;
-                gap: 0.8rem;
-                padding: 0.85rem 1.1rem;
-                font-family: var(--mono);
-                font-size: 0.82rem;
-            }
-            .lrow + .lrow {
-                border-top: 1px dashed var(--border-soft);
-            }
-            .lrow .host {
-                color: var(--dim);
-                white-space: nowrap;
-            }
-            .lrow .dots {
-                flex: 1;
-                border-bottom: 1px dotted var(--muted);
-                transform: translateY(-0.3em);
-                min-width: 2rem;
-            }
-            .lrow .id {
-                color: var(--sem);
-                white-space: nowrap;
-            }
-            .ledger .foot {
-                padding: 0.8rem 1.1rem 0.95rem;
-                border-top: 1px solid var(--border-soft);
-                color: var(--dim);
-                font-size: 0.83rem;
-                line-height: 1.55;
-            }
-            @media (max-width: 560px) {
-                .lrow {
-                    flex-wrap: wrap;
-                    gap: 0.25rem 0.8rem;
-                }
-                .lrow .dots {
-                    display: none;
-                }
-                .lrow .id {
-                    width: 100%;
-                }
-            }
+<section id="say">
+<div class="eyebrow">Corrections</div>
+<h2>If a number on this page is wrong, that is the message we most want.</h2>
+<p class="lede">This page is generated from a record and gated, which catches a value that drifted from its witness. It cannot catch a witness that was wrong to begin with. If you maintain specs for agents and <em>did the meaning change</em> costs your team meetings, that is also worth hearing — it shapes what the compiler would have to accept.</p>
+<form class="say" action="https://formspree.io/f/xaewoadr" method="POST" novalidate>
+<div class="say-row">
+<label class="say-f"><span>Your email</span><input type="email" name="email" autocomplete="email" placeholder="so a reply can reach you" required></label>
+<label class="say-f"><span>Message</span><textarea name="message" rows="3" placeholder="a question, a correction, a number of ours you think is wrong" required></textarea></label>
+</div>
+<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+<input type="hidden" name="_subject" value="SPECPROMPT v0.1.0 · RECORDS 2026-08-17">
+<div class="say-act"><button type="submit">Send</button><p class="say-msg" role="status" aria-live="polite"></p></div>
+</form>
+<p class="alt">Or file it in public: <a href="https://github.com/c-u-l8er/specprompt.com/issues">github.com/c-u-l8er/specprompt.com/issues</a>. Both reach the same people.</p>
+</section>
 
-            /* ---------- sections ---------- */
-            section {
-                padding: clamp(3.2rem, 8vw, 5.5rem) 0;
-                border-bottom: 1px solid var(--border-soft);
-            }
-            .kicker {
-                font-family: var(--mono);
-                font-size: 0.76rem;
-                letter-spacing: 0.22em;
-                text-transform: uppercase;
-                color: var(--muted);
-                margin-bottom: 1rem;
-            }
-            h2 {
-                font-family: var(--serif);
-                font-weight: 600;
-                font-size: clamp(1.55rem, 3.6vw, 2.3rem);
-                line-height: 1.18;
-                max-width: 26ch;
-            }
-            h2 em {
-                font-style: italic;
-                color: var(--blue);
-            }
-            .sub {
-                margin-top: 1.1rem;
-                max-width: 66ch;
-                color: var(--dim);
-            }
-            .sub strong {
-                color: var(--text);
-                font-weight: 600;
-            }
-            h3 {
-                font-family: var(--sans);
-                font-weight: 600;
-                font-size: 1.02rem;
-                letter-spacing: 0.01em;
-            }
-
-            .cols {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 2.2rem;
-                margin-top: 2.4rem;
-            }
-            @media (max-width: 760px) {
-                .cols {
-                    grid-template-columns: 1fr;
-                }
-            }
-            .col h3 {
-                color: var(--blue);
-                margin-bottom: 0.6rem;
-            }
-            .col p {
-                color: var(--dim);
-                font-size: 0.95rem;
-            }
-            .col p + p {
-                margin-top: 0.8rem;
-            }
-
-            .plain {
-                list-style: none;
-                margin-top: 1.6rem;
-                max-width: 68ch;
-            }
-            .plain li {
-                padding: 0.85rem 0;
-                border-top: 1px dashed var(--border-soft);
-                color: var(--dim);
-                font-size: 0.95rem;
-            }
-            .plain li strong {
-                color: var(--text);
-                font-weight: 600;
-            }
-
-            .note {
-                margin-top: 2.4rem;
-                border: 1px solid var(--border);
-                border-left: 3px solid var(--blue);
-                background: var(--surface);
-                padding: 1.2rem 1.4rem;
-                max-width: 76ch;
-                color: var(--dim);
-                font-size: 0.93rem;
-            }
-            .note strong {
-                color: var(--text);
-            }
-            .note.correction {
-                border-left-color: var(--amber);
-            }
-
-            /* ---------- tables ---------- */
-            .tablewrap {
-                margin-top: 2.4rem;
-                overflow-x: auto;
-                border: 1px solid var(--border-soft);
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 0.9rem;
-                min-width: 560px;
-            }
-            caption {
-                text-align: left;
-                font-family: var(--mono);
-                font-size: 0.72rem;
-                letter-spacing: 0.14em;
-                text-transform: uppercase;
-                color: var(--muted);
-                padding: 0.8rem 1rem;
-                border-bottom: 1px solid var(--border-soft);
-            }
-            th,
-            td {
-                text-align: left;
-                padding: 0.75rem 1rem;
-                border-bottom: 1px solid var(--border-soft);
-                vertical-align: top;
-            }
-            thead th {
-                font-family: var(--mono);
-                font-size: 0.72rem;
-                letter-spacing: 0.12em;
-                text-transform: uppercase;
-                color: var(--muted);
-                font-weight: 500;
-            }
-            tbody th[scope="row"] {
-                font-family: var(--mono);
-                font-weight: 500;
-                font-size: 0.84rem;
-                color: var(--text);
-                white-space: nowrap;
-            }
-            td.ref {
-                color: var(--dim);
-            }
-            td.win {
-                color: var(--amber);
-            }
-            td.ok {
-                color: var(--sem);
-            }
-            td.no {
-                color: var(--red);
-            }
-            /* built, deployed, and replaced by this page's own thesis. Not a
-               win, not a hole — the vocabulary needed a word for it. */
-            td.sup {
-                color: var(--blue);
-            }
-
-            /* ---------- open board ---------- */
-            .board {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-                gap: 1.1rem;
-                margin-top: 2.4rem;
-            }
-            .item {
-                border: 1px solid var(--border-soft);
-                background: var(--surface);
-                padding: 1.2rem 1.3rem;
-            }
-            .item h3 {
-                color: var(--red);
-                margin-bottom: 0.5rem;
-                font-size: 0.98rem;
-            }
-            .item p {
-                color: var(--dim);
-                font-size: 0.9rem;
-            }
-
-            /* ---------- contact / footer ---------- */
-            .family {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2.2rem;
-                margin-top: 2.4rem;
-            }
-            .family .k {
-                font-family: var(--mono);
-                font-size: 0.72rem;
-                letter-spacing: 0.14em;
-                text-transform: uppercase;
-                color: var(--muted);
-                margin-bottom: 0.3rem;
-            }
-            .family .v {
-                font-size: 0.92rem;
-            }
-            footer {
-                padding: 2.2rem 0 2.8rem;
-            }
-            footer .wrap {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 0.8rem;
-                font-family: var(--mono);
-                font-size: 0.76rem;
-                color: var(--muted);
-            }
-        </style>
-    </head>
-    <body>
-        <a class="skip" href="#main">Skip to content</a>
-        <script type="module" src="/amp-nav.js"></script>
-        <amp-nav property="specprompt"></amp-nav>
-        <nav>
-            <div class="wrap">
-                <a class="brand" href="#top">
-                    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-                        <path
-                            d="M8 0v32M16 0v32M24 0v32M0 8h32M0 16h32M0 24h32"
-                            stroke="#6EA8DC"
-                            stroke-width="0.75"
-                            opacity="0.5"
-                        />
-                        <path d="M7 17l6 6L26 9" fill="none" stroke="#58E07A" stroke-width="3" />
-                    </svg>
-                    SPEC<b>PROMPT</b>
-                </a>
-                <div class="navlinks">
-                    <a href="#settled">Settled</a>
-                    <a href="#unsettled">Unsettled</a>
-                    <a href="#spec">The spec</a>
-                    <a href="#measured">Measured</a>
-                    <a href="#status">Status</a>
-                    <a href="#open">Open</a>
-                </div>
-            </div>
-        </nav>
-
-        <header id="top">
-            <div class="wrap">
-                <div class="eyebrow">The specification layer of the ComputeDriven stack</div>
-                <h1>A spec is a claim about behavior. Give the claim a <em>checksum</em>.</h1>
-                <p class="lede">
-                    The industry spent 2025 agreeing that the spec — not the prompt, not the
-                    code — is the source of truth. Good. This page is about the question that
-                    stayed open: <strong>when are two specs the same spec, and what shows a run
-                    obeyed one?</strong> Here, a spec's meaning is a content-addressed canonical
-                    graph, and its identity is a string any machine can derive. Same string,
-                    same spec.
-                </p>
-
-                <div class="ledger" role="img" aria-label="Two machines deriving the same identity string for the same specification">
-                    <div class="head">
-                        <span>identity of the demo world</span>
-                        <b>match</b>
-                    </div>
-                    <div class="lrow">
-                        <span class="host">arch/linux · build workstation</span>
-                        <span class="dots" aria-hidden="true"></span>
-                        <span class="id">sem-8ae91fe9cbc5fd08</span>
-                    </div>
-                    <div class="lrow">
-                        <span class="host">t&amp;r · freebsd 15 guest</span>
-                        <span class="dots" aria-hidden="true"></span>
-                        <span class="id">sem-8ae91fe9cbc5fd08</span>
-                    </div>
-                    <div class="foot">
-                        Measured 2026-08-09. Two operating systems, one identity — derived by
-                        the same implementation on both, which is a weaker claim than two
-                        implementations agreeing, and stated as one.
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main id="main">
-        <section id="settled">
-            <div class="wrap">
-                <div class="kicker">The settled question</div>
-                <h2>Specs won. We are not here to reargue it.</h2>
-                <p class="sub">
-                    By mid-2026 the argument is over. GitHub's Spec Kit — an MIT-licensed,
-                    agent-agnostic toolkit — passed a hundred thousand stars this June. Amazon
-                    made Kiro, its spec-first IDE, generally available on 17 November 2025,
-                    turning prompts into EARS-notation requirements. OpenSpec holds tens of
-                    thousands more.
-                    Every major coding agent now ships some flavour of spec-driven development,
-                    and the phrase of the year is "the spec is the prompt."
-                </p>
-                <p class="sub">
-                    That consensus is the starting condition, not the product. Every one of
-                    those specs is prose — structured Markdown held together by convention and
-                    good intentions. The tools disagree about format, lifecycle, and tooling,
-                    but they agree completely about substance: a spec is a document a person
-                    reviews. We think that leaves the two hardest questions untouched.
-                </p>
-            </div>
-        </section>
-
-        <section id="unsettled">
-            <div class="wrap">
-                <div class="kicker">The unsettled question</div>
-                <h2>When are two specs <em>the same spec</em>?</h2>
-                <p class="sub">
-                    Rename a variable in a Markdown spec and the diff lights up, though nothing
-                    about the claim changed. Quietly weaken an acceptance criterion and the diff
-                    is one line among forty. Prose specs answer "did the meaning change?" with a
-                    review meeting. And on the other side of the loop: what shows a run actually
-                    obeyed the spec? A passing test suite is a sample, not a proof of what
-                    happened. We think both questions deserve arithmetic.
-                </p>
-                <div class="cols">
-                    <div class="col">
-                        <h3>Identity, not diff review</h3>
-                        <p>
-                            A spec here canonicalizes to a graph, and the graph hashes to an
-                            identity — a <span class="sem">sem-</span> string. Reformat the
-                            document, reorder clauses, rename freely: the identity holds.
-                            Change what the spec <em>claims</em> and the identity moves. "Did
-                            the meaning change" becomes string comparison, which means CI can
-                            answer it.
-                        </p>
-                    </div>
-                    <div class="col">
-                        <h3>Evidence, not assurance</h3>
-                        <p>
-                            A run against a spec seals into a film — a bundle someone else can
-                            replay on their own machine and get the same result, byte for byte.
-                            Conformance stops being a claim in a README and becomes an artifact
-                            you hand over. The receipt side of this story lives at
-                            <a href="https://fleetprompt.com">fleetprompt.com</a>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="spec">
-            <div class="wrap">
-                <div class="kicker">What a spec is here</div>
-                <h2>WRL underneath, Markdown on top — and nothing in between.</h2>
-                <p class="sub">
-                    The machinery is the WRL / TRVM / TRAAVIIS stack, documented at
-                    <a href="https://traaviis.com">traaviis.com</a>. The friendly surface is
-                    SPEC.md, and it is already built. Honesty requires the order to be stated
-                    plainly: <strong>both ends exist and nothing joins them.</strong> The
-                    machinery derives identities. The front end parses Markdown. No compiler
-                    runs between the two, so today a SpecPrompt spec is a validated document
-                    and not yet a checksummed one.
-                </p>
-                <ul class="plain">
-                    <li>
-                        <strong>WRL is the spec language.</strong> A program — or an agent's
-                        contract — is a network of riders separated by walls. Its meaning is a
-                        content-addressed canonical graph; its identity is derived from that
-                        graph, not from the bytes of the source file.
-                    </li>
-                    <li>
-                        <strong>TRVM is what reduces it.</strong> A term-rewriting runtime on
-                        the interaction calculus, where every step is a local rewrite and the
-                        result is schedule-independent — the property that makes "replay it
-                        yourself" a coherent offer rather than a hope.
-                    </li>
-                    <li>
-                        <strong>The document boundary is typed.</strong> The world (what the
-                        spec claims) and the scenario (what a particular run feeds it) are
-                        different documents, and mixing them is a typed rejection. An LLM's
-                        output enters as a claim, canonicalized at OBSERVE — so a film stays
-                        byte-exact even when the model behind it is not deterministic.
-                    </li>
-                    <li>
-                        <strong>Acceptance tests are films.</strong> A spec's acceptance runs
-                        seal into replayable bundles via TRAAVIIS's verifier,
-                        <code>trvs</code>. The bundle either replays to the same identity on
-                        your machine or it doesn't. There is no third state to argue about.
-                    </li>
-                    <li>
-                        <strong>The front end is built; the compiler to WRL is not.</strong>
-                        SPEC.md — parser, validator, linter, differ, a CLI and eight MCP tools,
-                        93 tests across Elixir and TypeScript, deployed at
-                        <a href="https://app.specprompt.com">app.specprompt.com</a> — is a real
-                        toolchain, built against the prose-spec consensus above and sharing its
-                        limits. What it cannot do is compile to WRL. That compiler is named,
-                        shaped, and unwritten, and it is the only thing standing between the two
-                        halves of this page.
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="measured">
-            <div class="wrap">
-                <div class="kicker">Measured</div>
-                <h2>What the numbers actually are, on 2026-08-09.</h2>
-                <p class="sub">
-                    One demo world exists. Its identity, <span class="sem">sem-8ae91fe9cbc5fd08</span>,
-                    is derived identically on the Arch Linux workstation that builds the T&amp;R
-                    image and on a booted T&amp;R guest — two operating systems, one string. The
-                    verifier's own <code>doctor</code> reports <code>status ready</code> on the
-                    guest: engine <code>v0.7.0-alpha.5</code>, reference interpreter and native
-                    runtime both present.
-                </p>
-                <div class="note">
-                    <strong>What that is not.</strong> It is the same implementation running on
-                    two systems, not two independent implementations agreeing on a semantics.
-                    The identity claim is only as strong as the single codebase that computes
-                    it. As of 2026-08-09 the guest is no longer hand-assembled — the T&amp;R
-                    build installs both pieces, and the machine that derived the string was
-                    created from that image and never touched afterwards. That removes a
-                    hand-copying caveat; it does not create a second implementation. The
-                    stronger claims are different claims, and this page has not made them.
-                </div>
-            </div>
-        </section>
-
-        <section id="status">
-            <div class="wrap">
-                <div class="kicker">Status</div>
-                <h2>What exists, and what is a name.</h2>
-                <div class="tablewrap">
-                    <table>
-                        <caption>Every row measured or admitted, 2026-08-09</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col">Piece</th>
-                                <th scope="col">What it is</th>
-                                <th scope="col">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">WRL</th>
-                                <td class="ref">the spec language — meaning as a canonical graph</td>
-                                <td class="win">real · upstream</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">TRVM</th>
-                                <td class="ref">the term-rewrite runtime that reduces it</td>
-                                <td class="win">in the T&amp;R image</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">trvs / TRAAVIIS</th>
-                                <td class="ref">seals a run into a replayable film</td>
-                                <td class="win">alpha · v0.7.0-alpha.5</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Identity check</th>
-                                <td class="ref">same sem- id on two operating systems</td>
-                                <td class="ok">measured · once</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">SPEC.md toolchain</th>
-                                <td class="ref">
-                                    parser, validator, linter, differ, CLI, 8 MCP tools — 93
-                                    tests, live at app.specprompt.com
-                                </td>
-                                <td class="sup">built · superseded</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Spec registry</th>
-                                <td class="ref">publish and browse specs — deployed, without films</td>
-                                <td class="sup">built · superseded</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Markdown → WRL compiler</th>
-                                <td class="ref">prose in, identity out — the join between the two halves</td>
-                                <td class="no">not built</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Diff by identity</th>
-                                <td class="ref">“did the meaning change?” as a string compare</td>
-                                <td class="no">not built</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Second implementation</th>
-                                <td class="ref">independent derivation of the same identities</td>
-                                <td class="no">not built</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <section id="open">
-            <div class="wrap">
-                <div class="kicker">Open</div>
-                <h2>What doesn't work yet, on the same page as what does.</h2>
-                <p class="sub">
-                    A page that only publishes its wins is asking you to take the wins on
-                    faith. These are the current holes, stated at the size they actually are.
-                </p>
-                <div class="board">
-                    <div class="item">
-                        <h3>The product on this domain is the previous one</h3>
-                        <p>
-                            What is deployed is the SPEC.md toolchain — real, tested, and built
-                            for the prose-spec world this page argues past. The compiler that
-                            would give a spec a derivable identity is a plan with a shape and
-                            zero lines of code.
-                        </p>
-                    </div>
-                    <div class="item">
-                        <h3>Identity covers the world, not the model</h3>
-                        <p>
-                            An LLM's output enters a run as a claim canonicalized at OBSERVE. A
-                            sealed film makes the run replayable — it does not make the model
-                            deterministic, and this page should never be read as saying so.
-                        </p>
-                    </div>
-                    <div class="item">
-                        <h3>One implementation</h3>
-                        <p>
-                            "Same identity on two machines" currently means one codebase
-                            agreeing with itself. Until a second, independent implementation
-                            derives the same sem- ids, the semantics rests on one program.
-                        </p>
-                    </div>
-                    <div class="item">
-                        <h3>Ergonomics unproven</h3>
-                        <p>
-                            Whether working engineers will accept graphs-with-checksums over
-                            prose they can skim is untested with anyone but us. The Markdown
-                            front end exists precisely because we suspect the answer is no.
-                        </p>
-                    </div>
-                    <div class="item">
-                        <h3>Drift detection is demo-sized</h3>
-                        <p>
-                            Catching spec-versus-implementation drift by identity has run
-                            against exactly one world. Every claim about it scales from a
-                            sample of one.
-                        </p>
-                    </div>
-                    <div class="item">
-                        <h3>The old roadmap slipped</h3>
-                        <p>
-                            The previous page promised a v1.0 format in Q1 2026 with parsers in
-                            two languages. The parsers shipped — Elixir and TypeScript, same
-                            output. The v1.0 format did not, and the quarters passed. The dates
-                            are gone; the status table above replaced them.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="note correction">
-                    <strong>This page replaces an earlier one.</strong> The earlier
-                    specprompt.com carried a quarterly roadmap whose dates passed without the
-                    v1.0 format they promised, and an ecosystem diagram drawing a pipeline its
-                    products had never run end to end. The dates are gone. What remains is
-                    either measured, linked to something you can run, or marked
-                    <span style="color: var(--red)">not built</span> — and where a thing is
-                    built and deployed but replaced by the argument above, it says
-                    <span style="color: var(--blue)">built · superseded</span> rather than
-                    taking credit for it or pretending it was never there.
-                </div>
-            </div>
-        </section>
-
-        <section id="work">
-            <div class="wrap">
-                <div class="kicker">Follow the work</div>
-                <h2>If the unsettled question is your question too.</h2>
-                <p class="sub">
-                    The machinery is public and documented; the front end will grow in the
-                    open. If you maintain specs for agents and the phrase "did the meaning
-                    change?" costs your team meetings, we would like to hear how — that
-                    conversation shapes what the compiler accepts.
-                </p>
-                <div class="family">
-                    <div>
-                        <div class="k">Email</div>
-                        <div class="v">hello@computedriven.com</div>
-                    </div>
-                    <div>
-                        <div class="k">Machinery</div>
-                        <div class="v"><a href="https://traaviis.com">traaviis.com</a></div>
-                    </div>
-                    <div>
-                        <div class="k">Source</div>
-                        <div class="v"><a href="https://github.com/c-u-l8er">github.com/c-u-l8er</a></div>
-                    </div>
-                    <div>
-                        <div class="k">Studio</div>
-                        <div class="v"><a href="https://computedriven.com">computedriven.com</a></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        </main>
-
-        <footer>
-            <div class="wrap">
-                <span>SpecPrompt — the specification layer</span>
-                <span>a ComputeDriven site · sibling: <a href="https://fleetprompt.com">fleetprompt.com</a></span>
-            </div>
-        </footer>
-    </body>
-</html>
+</main>
+</div>
+<footer><div class="in">
+<span class="stamp">SPECPROMPT v0.1.0 · RECORDS 2026-08-17</span>
+<span class="links"><a href="https://app.specprompt.com">Toolchain</a><a href="https://github.com/c-u-l8er/specprompt.com">Source</a><a href="https://docs.ampersandboxdesign.com/#/specprompt.com/docs/spec/README.md">Format</a><a href="https://github.com/c-u-l8er/specprompt.com/issues">File a correction</a><a href="https://fleetprompt.com">Sibling: fleetprompt</a></span>
+</div>
+<div class="attrib">This page is generated from <code>records/surface.json</code> and from the test suites themselves, and <code>launch-gate.mjs</code> refuses to publish it when the artifact and the records disagree. Its whole content ships with zero JavaScript &mdash; the correction form posts without it, the portfolio nav and the identifying animation are the only scripts, and the animation reads nothing from this page and writes nothing to it. &copy; 2026 SpecPrompt, a ComputeDriven site.</div>
+</footer>
+<script src="/derive.js" defer></script>
+<script src="/form.js" defer></script>
+</body></html>
