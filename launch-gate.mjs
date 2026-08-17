@@ -356,10 +356,27 @@ T("review ledger: the external rung is not self-awarded",
    portfolio should copy, and this is the column it meant. A redesign is
    allowed to move it; it is not allowed to soften it. */
 {
-    const mustSurvive = surface.pieces.filter((p) => !p.measured).map((p) => p.status);
-    const lost = [...new Set(mustSurvive)].filter((s) => !VISIBLE.includes(s));
-    T("the unbacked-status vocabulary survives the redesign", lost.length === 0,
-        lost.length ? `FLATTENED: ${lost.join(", ")}` : `${[...new Set(mustSurvive)].join(" · ")}`);
+    /* THE VOCABULARY IS HARDCODED HERE, NOT READ FROM THE RECORD, and that is
+       the whole point. The first draft compared the page against
+       surface.pieces[].status — so renaming "not built" to "coming soon" in
+       the record and letting the build carry it through PASSED. A deliberate
+       break found it here and twice more on the sibling surface. A check whose
+       expectation is edited by the same commit as the thing it checks is not a
+       check; the gate is the law and the record is the data. */
+    const MUST_SAY = ["not built", "built · superseded", "measured · once"];
+    const NEVER_SAY = ["coming soon", "launching soon", "in progress", "on the roadmap",
+        "shipping soon", "available soon", "under development", "work in progress", "beta soon"];
+    const missing = MUST_SAY.filter((s) => !VISIBLE.includes(s));
+    T("the honest-status vocabulary survives the redesign", missing.length === 0,
+        missing.length ? `FLATTENED — the page no longer says: ${missing.map((s) => JSON.stringify(s)).join(", ")}` : MUST_SAY.join(" · "));
+    const softened = NEVER_SAY.filter((s) => new RegExp(s, "i").test(VISIBLE));
+    T("no unbuilt thing is described with a marketing tense", softened.length === 0,
+        softened.length ? `SOFTENED: ${softened.join(", ")}` : `${NEVER_SAY.length} substitutes, none present`);
+    const ALLOWED = new Set([...MUST_SAY, "real · upstream", "in the T&R image",
+        "alpha · v0.7.0-alpha.5", "shipping", "in the image"]);
+    const odd = surface.pieces.map((p) => p.status).filter((s) => !ALLOWED.has(s));
+    T("every status in the record is drawn from the agreed vocabulary", odd.length === 0,
+        odd.length ? `UNRECOGNISED: ${[...new Set(odd)].join(", ")}` : `${surface.pieces.length} pieces`);
     T("every piece in the record reaches the page",
         surface.pieces.every((p) => VISIBLE.includes(p.piece)), `${surface.pieces.length} pieces`);
 }
