@@ -1,7 +1,6 @@
 {
   "schema": "computedriven-surface-v1",
   "_comment": "The frozen record the landing page is GENERATED from. Nothing on the emitted page may state a rung, a status or a count that is not derived here or RECOMPUTED by build-site.mjs by running the suites themselves. launch-gate.mjs then reads the emitted index.html and refuses to publish when the artifact and this record disagree. Do not hand-edit index.html — the next build reverts it.",
-
   "shell_revision": "shell-r9",
   "version": "0.1.0",
   "origin": "https://specprompt.com",
@@ -10,39 +9,35 @@
   "surface": "SpecPrompt",
   "layer": "specification",
   "parent": "ComputeDriven",
-
   "tier": 3,
   "_tier_comment": "READ THE NAV, NOT THE TEMPLATE. ampersand-nav/src/amp-nav.js records specprompt as { place: 3, rung: 'live_deployed' }, and its own renderPlacement() (line 1690) gives the layer sentence to place 2 ONLY — place 3 gets 'a specification in the ComputeDriven world' plus a spec link. This page embeds <amp-nav property=\"specprompt\"> directly beneath this band, so a layer sentence here would contradict the nav rendered one element below it. The PRIOR page did exactly that: its hero eyebrow read 'The specification layer of the ComputeDriven stack'. That string is now in launch-gate.mjs's retraction blocklist. Checked 2026-08-17 by reading amp-nav.js; the nav source is lane N's and was NOT edited.",
   "_nav_rung_agreement": "amp-nav records rung 'live_deployed' for specprompt. This lane measured the same rung independently — app.specprompt.com answers 200 and its MCP endpoint speaks JSON-RPC — so the band and the nav beneath it print the same word. No divergence to report on the rung; the divergence was on the LAYER claim, above.",
-
   "question": "When are two specs the same spec?",
   "spec_file": "docs/spec/README.md",
-
   "surface_rung": "live_deployed",
   "rung_witness": "deployed_mcp_check",
   "_rung_witness_comment": "SHELL.md r5. 'Any pending gate blocks live_deployed' is too blunt — second_implementation and wrl_compiler are pending by construction and would freeze this surface forever. This names the ONE gate that witnesses the rung; launch-gate.mjs refuses if the named gate is not approved with its evidence.",
   "surface_rung_covers": "the SPEC.md toolchain at app.specprompt.com — the prior design, which parses, validates and lints prose specs and answers MCP over POST /mcp. It does not cover the content-addressed identity this page argues for: the compiler that would give a spec a derivable name is not built, so no spec served from this domain has one",
   "verified_at": "2026-08-17",
-
   "status": {
     "statement": "The SPEC.md toolchain is deployed and answering. app.specprompt.com returns 200, its health-bearing MCP endpoint at POST /mcp returns a well-formed JSON-RPC error rather than a web-server error, and the two reference parsers this repository ships agree with their own suites.",
     "source": "Four measurements on 2026-08-17. (1) mix test in specprompt.com — 71 tests, 0 failures. (2) npx vitest run in specprompt.com/npm — 22 tests, 0 failures. (3) curl https://app.specprompt.com/ — 200. (4) curl -X POST https://app.specprompt.com/mcp with a JSON-RPC tools/list body — 406 without an event-stream Accept header, and with one a JSON-RPC envelope carrying code -32600, which is the MCP server refusing an uninitialised session rather than a page failing to serve.",
     "limit": "This establishes that the prior toolchain runs on this domain and that two parsers agree with the tests written for them. It does not establish the claim this page is built on — that a spec has a derivable identity — because no compiler joins the Markdown front end to WRL. It does not establish that the deployed MCP server does anything useful past refusing an uninitialised call; no tool was invoked end to end. And the one identity measured across two operating systems was derived by a single implementation twice, which is not two implementations agreeing."
   },
-
   "advance": {
     "next_rung": "external",
     "requires": "A second implementation, written by someone who is not us, that derives the same sem- identity from the same canonical graph — or a spec whose identity this one gets wrong. Either moves the semantics off self-report. Nothing else will, and shipping the compiler will not: it would make the claim testable, not tested."
   },
-
   "identity": {
     "sem_id": "sem-8ae91fe9cbc5fd08",
     "measured_at": "2026-08-09",
-    "hosts": ["arch/linux · build workstation", "t&r · freebsd 15 guest"],
+    "hosts": [
+      "arch/linux · build workstation",
+      "t&r · freebsd 15 guest"
+    ],
     "engine": "v0.7.0-alpha.5",
     "_comment": "Carried forward from the prior landing page, NOT re-derived by this build. This lane owns two marketing repositories and neither contains the WRL/TRVM code that computes this string. It is published with the date it was measured on and with the reviewer field naming exactly that limitation. launch-gate.mjs refuses any sem- string on the page that is not this one."
   },
-
   "artifacts": [
     {
       "id": "toolchain",
@@ -69,7 +64,6 @@
       "witness": "A document. Nothing in it runs, and the section this page leans on hardest — the join from Markdown to a canonical graph — describes a compiler that has never been written."
     }
   ],
-
   "unmeasured": [
     {
       "id": "compiler",
@@ -112,20 +106,63 @@
       "built": "once, on a demo"
     }
   ],
-
   "_pieces_comment": "The prior page's status table, PRESERVED. The external audit named this domain and its sibling as the template the rest of the portfolio should copy, and this column is why: 'built · superseded' is used where a thing is deployed and running but replaced by the argument the page makes, which takes neither credit for it nor pretends it was never there. `measured: true` renders the status in the measured-value colour; `false` renders it in the unbacked-claim colour. Do not flatten either into marketing. No count appears in this table — counts belong in the suite table, where the build re-derives them.",
   "pieces": [
-    { "piece": "WRL", "what": "the spec language — meaning as a canonical graph", "status": "real · upstream", "measured": true },
-    { "piece": "TRVM", "what": "the term-rewrite runtime that reduces it", "status": "in the T&R image", "measured": true },
-    { "piece": "trvs / TRAAVIIS", "what": "seals a run into a replayable film", "status": "alpha · v0.7.0-alpha.5", "measured": true },
-    { "piece": "Identity check", "what": "the same sem- id derived on two operating systems", "status": "measured · once", "measured": true },
-    { "piece": "SPEC.md toolchain", "what": "parser, validator, linter, differ, a CLI and eight MCP tools, live on its own host", "status": "built · superseded", "measured": false },
-    { "piece": "Spec registry", "what": "publish and browse specs — deployed, and without films", "status": "built · superseded", "measured": false },
-    { "piece": "Markdown → WRL compiler", "what": "prose in, identity out — the join between the two halves of this page", "status": "not built", "measured": false },
-    { "piece": "Diff by identity", "what": "“did the meaning change?” as a string comparison", "status": "not built", "measured": false },
-    { "piece": "Second implementation", "what": "independent derivation of the same identities", "status": "not built", "measured": false }
+    {
+      "piece": "WRL",
+      "what": "the spec language — meaning as a canonical graph",
+      "status": "real · upstream",
+      "measured": true
+    },
+    {
+      "piece": "TRVM",
+      "what": "the term-rewrite runtime that reduces it",
+      "status": "in the T&R image",
+      "measured": true
+    },
+    {
+      "piece": "trvs / TRAAVIIS",
+      "what": "seals a run into a replayable film",
+      "status": "alpha · v0.7.0-alpha.5",
+      "measured": true
+    },
+    {
+      "piece": "Identity check",
+      "what": "the same sem- id derived on two operating systems",
+      "status": "measured · once",
+      "measured": true
+    },
+    {
+      "piece": "SPEC.md toolchain",
+      "what": "parser, validator, linter, differ, a CLI and eight MCP tools, live on its own host",
+      "status": "built · superseded",
+      "measured": false
+    },
+    {
+      "piece": "Spec registry",
+      "what": "publish and browse specs — deployed, and without films",
+      "status": "built · superseded",
+      "measured": false
+    },
+    {
+      "piece": "Markdown → WRL compiler",
+      "what": "prose in, identity out — the join between the two halves of this page",
+      "status": "not built",
+      "measured": false
+    },
+    {
+      "piece": "Diff by identity",
+      "what": "“did the meaning change?” as a string comparison",
+      "status": "not built",
+      "measured": false
+    },
+    {
+      "piece": "Second implementation",
+      "what": "independent derivation of the same identities",
+      "status": "not built",
+      "measured": false
+    }
   ],
-
   "zero_counts": [
     {
       "label": "Specs on this domain with a derivable identity",
@@ -138,7 +175,6 @@
       "witness": "One codebase derived the demo world's identity on two operating systems. That is the same program run twice. A second implementation is what would turn a portability result into a semantics result."
     }
   ],
-
   "retracted": [
     {
       "string": "The specification layer of the ComputeDriven stack",
@@ -149,14 +185,12 @@
       "why": "An email address published on a public page. SITES.md 0.5, Travis's call of 2026-08-11: contact is never a mailbox. Corrections go to the repository's issues."
     }
   ],
-
   "contact": {
     "kind": "formspree",
     "endpoint": "https://formspree.io/f/xaewoadr",
     "url": "https://github.com/c-u-l8er/specprompt.com/issues",
     "_comment": "SHELL.md r9. RULED by Travis: use the same Formspree endpoint computedriven.com uses, and copy its shape rather than only its URL — a real <form action method novalidate> that posts with scripting off, JS only upgrading it to an inline reply, success printed only on an actual 2xx, the _gotcha honeypot present, and the reply paragraph role=status aria-live=polite. The issues URL is kept as the secondary route for anyone who would rather file a correction in public. Still no mailto: anywhere, and launch-gate.mjs refuses one."
   },
-
   "gates": {
     "_comment": "A gate may not read approved without its evidence, reviewer and date fields, and launch-gate.mjs enforces that in the artifact.",
     "parser_agreement": {
@@ -207,5 +241,16 @@
       "reviewer": null,
       "date": null
     }
+  },
+  "type_metrics": {
+    "_comment": "SHELL.md r7: display faces vary enormously in ink height, so a line-height that is safe in one is broken in another. Measured in a browser with canvas TextMetrics in the h1's OWN computed font — actualBoundingBoxAscent + actualBoundingBoxDescent against the computed line box — not assumed. launch-gate.mjs refuses if src/shell.css stops declaring the value that was measured to fit.",
+    "h1_face": "Spectral 600",
+    "h1_px": 59.2,
+    "h1_ink_px": 60.0,
+    "h1_line_box_px": 66.3,
+    "h1_line_height": "1.12",
+    "headroom_px": 6.3,
+    "measured_at": "2026-08-17",
+    "measured_with": "agent-browser --session prompts, at 1280x800"
   }
 }

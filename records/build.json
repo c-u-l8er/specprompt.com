@@ -1,7 +1,7 @@
 {
   "schema": "computedriven-build-v1",
   "_comment": "Written by build-site.mjs at emit. launch-gate.mjs re-hashes each artifact and refuses if one does not match — which is how the gate knows it is reading THIS build's output rather than a survivor of a build that threw before it rewrote the file. Source hashes are recorded too, so a source edited after the emit is caught as well.",
-  "built_at": "2026-08-17T16:59:04.362Z",
+  "built_at": "2026-08-17T17:07:48.269Z",
   "version": "0.1.0",
   "shell_revision": "shell-r9",
   "artifacts": {
@@ -14,6 +14,6 @@
     "src/shell.css": "d8335315a836e5501598630164f348e073c990b59202da09fa17f25d4f61763d",
     "src/derive.js": "48a410b016b87c30b968d61d547c2100fa817a21ecdfe23786ed9a72c813b26b",
     "src/form.js": "aa13d8712afefb16dcdd6fe70c84f7a96d7ccf085c2da9e0931b5771a8640979",
-    "records/surface.json": "89f2bb5b6f454be31d78a47f35619cc40b035060cdb030b9f8e97efed0e41a13"
+    "records/surface.json": "1384042f265231ecf0f33370f8c2177064b777daab375cbda56213907f8768ef"
   }
 }

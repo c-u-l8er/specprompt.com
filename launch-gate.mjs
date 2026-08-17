@@ -827,6 +827,22 @@ T("the least legible declared pair clears the 4.5:1 floor", worst >= MIN_RATIO,
     T("/ every interactive element has a visible :hover", naked.length === 0,
         naked.length ? `no hover for: ${naked.join(", ")}` : `${handles.size} kinds, all covered`);
     T("/ declares a focus-visible ring", /:focus-visible\s*\{/.test(styles));
+    /* r7 — the h1's ink must fit its line box, and the value that was measured
+       to fit must still be the value declared. Node cannot render a font, so
+       the measurement lives in the record with the browser and viewport that
+       produced it, and this refuses when the CSS drifts away from it. A face
+       swap without a re-measurement is exactly how a sibling shipped a clipped
+       descender at 1.02. */
+    const tm = surface.type_metrics;
+    T("the h1's measured ink box fits its line box",
+        !!tm && tm.h1_ink_px <= tm.h1_line_box_px,
+        tm ? `${tm.h1_face} at ${tm.h1_px}px — ink ${tm.h1_ink_px}px in a ${tm.h1_line_box_px}px box, ${tm.headroom_px}px headroom` : "no measurement recorded");
+    T("the stylesheet still declares the line-height that was measured",
+        !!tm && new RegExp(`h1\\{[^}]*line-height:${tm.h1_line_height.replace(".", "\\.")}[;}]`).test(styles),
+        tm ? `line-height:${tm.h1_line_height}` : "no measurement recorded");
+    T("the stylesheet still declares the display face that was measured",
+        !!tm && styles.includes(tm.h1_face.replace(/ \d+$/, "")),
+        tm ? tm.h1_face : "no measurement recorded");
     T("/ the form's inputs have a hover and a focus state",
         /\.say input:hover/.test(styles) && /\.say input:focus/.test(styles));
 }
