@@ -25,8 +25,11 @@ rung has not earned, an unrendered token, a `mailto:` or an email address, a
 text token below 4.5:1, a same-origin link that resolves to nothing, an
 artifact that is not what this build emitted, an identifying-animation constant
 leaking into the copy, or a button whose colour is decided by a non-button
-rule. **114 checks**, and it prints its own total &mdash; do not hand-type it
-anywhere; that is exactly how the published and printed numbers drift apart.
+rule. **It prints its own total** &mdash; 115 on 2026-08-17, and that figure is
+the only one in this repository that is not derived, which is why it carries a
+date. **Do not hand-type a check count anywhere:** it went from 92 to 115 in a
+single session, and a typed count is exactly how a printed number and a
+published one drift apart.
 
 Built against **`shell-r9`**, recorded as `shell_revision` in
 `records/surface.json`. The whole shell is documented in
