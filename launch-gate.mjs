@@ -86,8 +86,19 @@ function visibleText(html) {
         .map((s) => s.replace(/&\w+;/g, (e) => (e in ENT ? ENT[e] : e)).trim())
         .filter(Boolean);
 }
-/* Everything a reader can see, as one string, for substring questions. */
-const VISIBLE = visibleText(landing).join("\n");
+/* r12 — TEST PHRASES AGAINST NODES, NOT A FLATTENED BLOB.
+   `html.replace(/<[^>]+>/g," ")` is the usual next step after stripping
+   comments, and it merges every text node into one run so that a rule like
+   `includes("Get started")` can match text a reader never sees together — or,
+   where the blob is then split on whitespace, can never match at all. Two
+   multi-word rules on a sibling surface were silently unfalsifiable that way,
+   one of them "no signup CTA at the spec rung". visibleText() splits ON tags,
+   so each text node survives as one node; PHRASE() asks the nodes. */
+const NODES = visibleText(landing);
+const PHRASE = (p) => NODES.some((n) => n.toLowerCase().includes(p.toLowerCase()));
+/* Kept for substring questions that are deliberately node-agnostic (a stray
+   email address, a dangling § citation) — never for a phrase rule. */
+const VISIBLE = NODES.join("\n");
 /* And the markup with comments removed, for questions about what was emitted
    rather than what is read — an href in a comment is not a link either. */
 const MARKUP = landing.replace(/<!--[\s\S]*?-->/g, " ");
@@ -104,6 +115,14 @@ const MARKUP = landing.replace(/<!--[\s\S]*?-->/g, " ");
         .filter((w) => VISIBLE.includes(w) && !stripToText(MARKUP).includes(w));
     T("the text extractor removes comments before tags (r8)", leaked.length === 0,
         `${comments.length} comments, ${withAngle.length} containing '>' — none leaked`);
+    /* r12 — and it must keep a text node whole, or every multi-word rule below
+       is unfalsifiable while reporting PASS. Proved against a phrase this page
+       actually contains and one it does not, so a refactor that shreds nodes
+       into words fails HERE rather than silently disarming the blocklists. */
+    const multi = NODES.filter((n) => n.split(" ").length > 3).length;
+    T("the text extractor keeps text nodes whole (r12)",
+        multi > 0 && PHRASE(surface.question) && !PHRASE("a phrase this page does not contain"),
+        `${NODES.length} nodes, ${multi} of more than three words; the surface question is findable as one phrase`);
 }
 
 /* ---------- 1. release identity ---------- */
@@ -202,8 +221,16 @@ T("the correction channel is the ruled Formspree endpoint",
     T("/ carries a real form, not a fetch bolted to a button",
         /action="[^"]+"/.test(form) && /method="POST"/i.test(form) && /\bnovalidate\b/.test(form));
     T("the form posts to the ruled endpoint", form.includes(`action="${surface.contact.endpoint}"`));
-    T("the form carries the _gotcha honeypot, hidden from people",
-        /name="_gotcha"/.test(form) && /tabindex="-1"/.test(form) && /aria-hidden="true"/.test(form));
+    /* r12 — SCOPE A STRUCTURAL CHECK TO THE ELEMENT. Testing
+       `/name="_gotcha"/` against the document passes with the honeypot deleted,
+       because the inlined stylesheet still carries `.say input[name=_gotcha]`
+       — a CSS selector satisfying a check about markup. This finds the <input>
+       and requires all three attributes on THAT element. */
+    const honeypot = [...form.matchAll(/<input\b[^>]*>/gi)]
+        .find((el) => /\bname="_gotcha"/.test(el[0]));
+    T("the form carries the _gotcha honeypot as an element, hidden from people",
+        !!honeypot && /\btabindex="-1"/.test(honeypot[0]) && /\baria-hidden="true"/.test(honeypot[0]),
+        honeypot ? honeypot[0].slice(0, 88) : "no <input name=\"_gotcha\"> element in the form");
     T("the reply paragraph announces itself to a screen reader",
         /class="say-msg"[^>]*role="status"[^>]*aria-live="polite"/.test(form));
     T("the form upgrade prints success only on a real 2xx",
@@ -366,10 +393,10 @@ T("review ledger: the external rung is not self-awarded",
     const MUST_SAY = ["not built", "built · superseded", "measured · once"];
     const NEVER_SAY = ["coming soon", "launching soon", "in progress", "on the roadmap",
         "shipping soon", "available soon", "under development", "work in progress", "beta soon"];
-    const missing = MUST_SAY.filter((s) => !VISIBLE.includes(s));
+    const missing = MUST_SAY.filter((x) => !PHRASE(x));
     T("the honest-status vocabulary survives the redesign", missing.length === 0,
         missing.length ? `FLATTENED — the page no longer says: ${missing.map((s) => JSON.stringify(s)).join(", ")}` : MUST_SAY.join(" · "));
-    const softened = NEVER_SAY.filter((s) => new RegExp(s, "i").test(VISIBLE));
+    const softened = NEVER_SAY.filter((x) => PHRASE(x));
     T("no unbuilt thing is described with a marketing tense", softened.length === 0,
         softened.length ? `SOFTENED: ${softened.join(", ")}` : `${NEVER_SAY.length} substitutes, none present`);
     const ALLOWED = new Set([...MUST_SAY, "real · upstream", "in the T&R image",
@@ -378,7 +405,7 @@ T("review ledger: the external rung is not self-awarded",
     T("every status in the record is drawn from the agreed vocabulary", odd.length === 0,
         odd.length ? `UNRECOGNISED: ${[...new Set(odd)].join(", ")}` : `${surface.pieces.length} pieces`);
     T("every piece in the record reaches the page",
-        surface.pieces.every((p) => VISIBLE.includes(p.piece)), `${surface.pieces.length} pieces`);
+        surface.pieces.every((p) => PHRASE(p.piece)), `${surface.pieces.length} pieces`);
 }
 
 /* ---------- 14. every path this page tells a reader to load resolves ---------- */

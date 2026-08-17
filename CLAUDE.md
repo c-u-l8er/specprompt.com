@@ -2,6 +2,45 @@
 
 Open standard and toolchain for spec-driven AI development. Defines a Markdown-based specification format (SPEC.md) that is human-readable and machine-parseable.
 
+
+## The landing page is GENERATED. Do not hand-edit `index.html`.
+
+`/index.html`, `/derive.js` and `/form.js` are emitted by `build-site.mjs` from
+`records/surface.json`, `src/landing.html`, `src/shell.css`, `src/derive.js` and
+`src/form.js`. **An edit to the served HTML is silently reverted by the next
+build.** Change the record or the template.
+
+```
+./site.sh     # run the suite(s), emit the site, run the publication gate
+```
+
+`build-site.mjs` does not quote a test count — it **executes** the suite, parses
+what the runner prints, and refuses to emit anything if a number has moved off
+`records/tests.json`. That is how the count on this page stopped being a thing
+anyone could type.
+
+`launch-gate.mjs` reads the emitted artifact and refuses to publish when it and
+the records disagree: a retracted claim reinstated, a rung invented, a CTA the
+rung has not earned, an unrendered token, a `mailto:` or an email address, a
+text token below 4.5:1, a same-origin link that resolves to nothing, an
+artifact that is not what this build emitted, an identifying-animation constant
+leaking into the copy, or a button whose colour is decided by a non-button
+rule. **114 checks**, and it prints its own total &mdash; do not hand-type it
+anywhere; that is exactly how the published and printed numbers drift apart.
+
+Built against **`shell-r9`**, recorded as `shell_revision` in
+`records/surface.json`. The whole shell is documented in
+`ProjectAmp2/agents/SHELL.md`.
+
+**The band says "a specification in the ComputeDriven world", not "the specification
+layer of ComputeDriven", and that is deliberate.** `ampersand-nav` records this
+domain as `place: 3`, whose `renderPlacement()` gives the layer sentence to
+`place: 2` only. The old eyebrow claimed the layer and is now blocklisted.
+
+**Contact is the Formspree endpoint ruled by Travis (SHELL.md r9)**, as a real
+`<form>` that posts with scripting off; `src/form.js` only upgrades it to an
+inline reply and prints success solely on a 2xx. No `mailto:` anywhere.
+
 ## Source-of-truth spec
 
 - `docs/spec/README.md` — SpecPrompt product specification
